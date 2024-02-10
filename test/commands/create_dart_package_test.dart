@@ -16,7 +16,8 @@ import 'package:path/path.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final tempDir = Directory.systemTemp; // Directory('/tmp');
+  final tempDir =
+      Directory('/tmp').existsSync() ? Directory('/tmp') : Directory.systemTemp;
   final logMessages = <String>[];
   const String description = 'This is a description of the package. '
       'It should be at least 60 characters long.';
@@ -350,6 +351,16 @@ void main() {
       expect(binFileContent, contains('Future<void> runAudTest({'));
       expect(binFileContent, contains('addCommand(AudTestCmd(log: log)'));
 
+      // ..............................
+      // Should create a install script
+      final installScript =
+          File(join(tempPackageDir.path, 'install.dart')).readAsStringSync();
+      expect(
+        installScript,
+        contains('const exe = \'audTest\';'),
+      );
+
+      // ...........................
       // Should delete aud_test_base
       final audTestBaseFile =
           File(join(tempPackageDir.path, 'lib', 'src', 'aud_test_base.dart'));

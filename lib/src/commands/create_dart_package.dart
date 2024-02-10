@@ -7,6 +7,8 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:aud_cli_create_dart_package/src/snippets/install_snippet.dart';
+import 'package:aud_cli_create_dart_package/src/snippets/make_executable_snippet.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart';
 import 'package:recase/recase.dart';
@@ -172,6 +174,7 @@ class _CreateDartPackage {
     _prepareBin();
     _prepareTest();
     _prepareExample();
+    _prepareInstallScript();
     _removeUnusedFiles();
     _installDevDependencies();
     _installDependencies();
@@ -396,6 +399,21 @@ class _CreateDartPackage {
   }
 
   // ...........................................................................
+  void _makeFileExecutable(String filePath) {
+    // Execute chmod +x bin/$packageName.dart
+    final result = Process.runSync(
+      'chmod',
+      ['+x', filePath],
+    );
+
+    if (result.exitCode != 0) {
+      // coverage:ignore-start
+      throw Exception('Error while running "chmod +x $filePath"');
+      // coverage:ignore-end
+    }
+  }
+
+  // ...........................................................................
   void _preparePubspec() {
     log('Prepare pubspec.yaml...');
     final pubspecFile = join(packageDir, 'pubspec.yaml');
@@ -461,24 +479,13 @@ class _CreateDartPackage {
       packageName: packageName,
       description: description,
     );
-    const makeExecutable = '#!/usr/bin/env dart\n';
 
-    binFileContent = '$makeExecutable$fileHeaderSnippet\n\n$binFileContent\n';
+    binFileContent =
+        '$makeExecutableSnippet' '$fileHeaderSnippet\n\n' '$binFileContent\n';
     binFileContent = formatter.format(binFileContent);
 
     File(binFile).writeAsStringSync(binFileContent);
-
-    // Execute chmod +x bin/$packageName.dart
-    final result = Process.runSync(
-      'chmod',
-      ['+x', binFile],
-    );
-
-    if (result.exitCode != 0) {
-      // coverage:ignore-start
-      throw Exception('Error while running "chmod +x $binFile"');
-      // coverage:ignore-end
-    }
+    _makeFileExecutable(binFile);
   }
 
   // ...........................................................................
@@ -502,9 +509,24 @@ class _CreateDartPackage {
         join(exampleFolder, '${packageName.snakeCase}_example.dart');
 
     final exampleFileContent = exampleSnippet(packageName: packageName);
-    final content =
-        formatter.format('$fileHeaderSnippet\n\n$exampleFileContent\n');
+    final content = '$makeExecutableSnippet'
+        '$fileHeaderSnippet\n\n'
+        '$exampleFileContent\n';
+
     File(exampleFile).writeAsStringSync(content);
+    _makeFileExecutable(exampleFile);
+  }
+
+  // ...........................................................................
+  void _prepareInstallScript() {
+    log('Prepare install script...');
+    final installFile = join(packageDir, 'install.dart');
+    final installContent = installSnippet(packageName: packageName);
+    final content = formatter.format(
+      '$makeExecutableSnippet' '$fileHeaderSnippet\n\n' '$installContent\n',
+    );
+    File(installFile).writeAsStringSync(content);
+    _makeFileExecutable(installFile);
   }
 
   // ...........................................................................
