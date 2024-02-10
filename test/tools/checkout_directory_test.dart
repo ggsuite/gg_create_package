@@ -14,11 +14,13 @@ void main() {
   group('getCheckOutDir', () {
     // #########################################################################
 
-    test('should return the parent of the aud_cli directory', () {
+    test(
+        'should return the parent of the aud_cli_create_dart_package directory',
+        () {
       final checkOutDir = checkoutDirectory();
       expect(Directory(checkOutDir).existsSync(), isTrue);
 
-      final audCliDir = join(checkOutDir, 'aud_cli');
+      final audCliDir = join(checkOutDir, 'aud_cli_create_dart_package');
       expect(Directory(audCliDir).existsSync(), isTrue);
     });
   });

@@ -20,23 +20,29 @@ void main() {
     // #########################################################################
 
     group('should return the current project directory', () {
-      test('when the current working directory is the aud_cli directory', () {
-        // Expect the current working directory to end with 'aud_cli'
-        expect(audCliDirectory(), endsWith('aud_cli'));
+      test(
+          'when the current working directory is the '
+          'aud_cli_create_dart_package directory', () {
+        // Expect the current working directory to end with
+        // 'aud_cli_create_dart_package'
+        expect(audCliDirectory(), endsWith('aud_cli_create_dart_package'));
       });
 
-      test('when the current working directory is the parent dir of aud_cli',
-          () {
-        // Change the current working directory to the parent dir of aud_cli
+      test(
+          'when the current working directory is the parent dir of '
+          'aud_cli_create_dart_package', () {
+        // Change the current working directory to the parent dir of
+        // aud_cli_create_dart_package
         Directory.current = Directory.current.parent;
-        expect(audCliDirectory(), endsWith('aud_cli'));
+        expect(audCliDirectory(), endsWith('aud_cli_create_dart_package'));
       });
     });
 
     test(
         'should throw when the current working dir '
-        'is not checkout dir or aud_cli dir', () {
-      // Change the current working dir to the grandparent dir of aud_cli
+        'is not checkout dir or aud_cli_create_dart_package dir', () {
+      // Change the current working dir to the grandparent dir of
+      // aud_cli_create_dart_package
       Directory.current = Directory.systemTemp;
       expect(
         () => audCliDirectory(),
@@ -46,7 +52,7 @@ void main() {
             'message',
             'Exception: The current directory needs to be '
                 'either a subdirectory or the direct parent directory '
-                'of aud_cli.',
+                'of aud_cli_create_dart_package.',
           ),
         ),
       );

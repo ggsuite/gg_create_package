@@ -51,8 +51,5 @@ jobs:
       - name: Make Script Executable
         run: chmod +x ./check.dart
 
-      - name: Run tests
-        run: dart test
-
       - name: Run Script
         run: ./check.dart --verbose
