@@ -8,13 +8,15 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:aud_cli_create_dart_package/src/commands/create_dart_package.dart';
-import 'package:aud_cli_create_dart_package/src/snippets.dart';
+import 'package:aud_cli_create_dart_package/src/snippets/file_header.dart';
+import 'package:aud_cli_create_dart_package/src/snippets/open_source_licence.dart';
+import 'package:aud_cli_create_dart_package/src/snippets/private_license.dart';
 import 'package:aud_cli_create_dart_package/src/tools.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final tempDir = Directory.systemTemp; // Directory('/tmp');
+  final tempDir = Directory('/tmp'); // Directory.systemTemp;;
   final logMessages = <String>[];
   const String description = 'This is a description of the package. '
       'It should be at least 60 characters long.';
@@ -302,6 +304,22 @@ void main() {
       );
       expect(pubspec.contains(pattern), isTrue);
 
+      // ..............................
+      // Should prepare launch.json
+      final launchJson =
+          File(join(tempPackageDir.path, '.vscode', 'launch.json'))
+              .readAsStringSync();
+
+      expect(launchJson, contains(r'"name": "Run AudTest"'));
+      expect(
+        launchJson,
+        contains(r'"program": "${workspaceFolder}/bin/aud_test.dart"'),
+      );
+      expect(
+        launchJson,
+        contains(r'"program": "${workspaceFolder}/bin/aud_test.dart"'),
+      );
+
       // ....................
       // Should update README
       final readme =
@@ -318,12 +336,24 @@ void main() {
           File(join(tempPackageDir.path, 'CHANGELOG.md')).readAsStringSync();
       expect(changeLog, '# Change Log\n\n## 1.0.0\n\n- Initial version.\n');
 
-      // Should add comment to aud_test_base.dart
-      final audTestBase =
-          File(join(tempPackageDir.path, 'lib', 'src', 'aud_test_base.dart'))
-              .readAsStringSync();
-      expect(audTestBase, contains(fileHeader));
-      expect(audTestBase, contains(baseDartSnippet));
+      // .......................................
+      // Should init executable in bin directory
+      final binFile = File(join(tempPackageDir.path, 'bin', 'aud_test.dart'));
+      expect(binFile.existsSync(), isTrue);
+      final binFileContent = binFile.readAsStringSync();
+      expect(binFileContent, startsWith('#!/usr/bin/env dart\n'));
+      expect(binFileContent, contains(fileHeader));
+      expect(
+        binFileContent,
+        contains('import \'package:aud_test/aud_test.dart\';'),
+      );
+      expect(binFileContent, contains('Future<void> runAudTest({'));
+      expect(binFileContent, contains('addCommand(AudTestCmd(log: log)'));
+
+      // Should delete aud_test_base
+      final audTestBaseFile =
+          File(join(tempPackageDir.path, 'lib', 'src', 'aud_test_base.dart'));
+      expect(audTestBaseFile.existsSync(), isFalse);
 
       // ...............
       // Should init git

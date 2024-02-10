@@ -11,6 +11,8 @@ dependencies:
   path: ^1.8.0
   args: ^2.4.2
   colorize: ^3.0.0
+  recase: ^4.1.0
+  dart_style: ^2.3.4
 
 dev_dependencies:
   coverage: ^1.7.2

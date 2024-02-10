@@ -7,10 +7,20 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart';
+import 'package:recase/recase.dart';
 
-import 'package:aud_cli_create_dart_package/src/snippets.dart';
-import 'package:aud_cli_create_dart_package/src/tools.dart';
+import '../snippets/bin_dart.dart';
+import '../snippets/example_dart.dart';
+import '../snippets/file_header.dart';
+import '../snippets/launch_json.dart';
+import '../snippets/lib_dart.dart';
+import '../snippets/open_source_licence.dart';
+import '../snippets/private_license.dart';
+import '../snippets/src_dart.dart';
+import '../snippets/test_dart.dart';
+import '../tools.dart';
 
 /// Creates a new package in the given directory.
 class CreateDartPackage extends Command<dynamic> {
@@ -135,6 +145,7 @@ class _CreateDartPackage {
   final bool prepareGitHub;
   final bool force;
   static const gitHubRepo = 'https://github.com/inlavigo';
+  final formatter = DartFormatter();
 
   // ...........................................................................
   Future<void> run() async {
@@ -154,9 +165,17 @@ class _CreateDartPackage {
     _copyGitHubActions();
     _preparePubspec();
     _prepareReadme();
+    _prepareLaunchJson();
     _prepareChangeLog();
+    _preapreSrc();
+    _prepareLib();
+    _prepareBin();
+    _prepareTest();
+    _prepareExample();
+    _removeUnusedFiles();
+    _installDevDependencies();
     _installDependencies();
-    _prepareBaseDart();
+    await _waitShortly();
     _fixErrorsAndWarnings();
     _initGit();
   }
@@ -356,19 +375,23 @@ class _CreateDartPackage {
   }
 
   // ...........................................................................
-  void _replaceInFile(String file, String search, String replace) {
-    final content = File(file).readAsStringSync();
+  void _replaceInFile(String file, Map<String, String> replacements) {
+    var content = File(file).readAsStringSync();
 
-    // Check if the search string is in the file
-    final pattern = RegExp(search, multiLine: true);
-    if (!pattern.hasMatch(content)) {
-      // coverage:ignore-start
-      throw Exception('Search string "$search" not found in file "$file"');
-      // coverage:ignore-end
+    for (final entry in replacements.entries) {
+      final pattern = RegExp(entry.key, multiLine: true);
+      if (!pattern.hasMatch(content)) {
+        // coverage:ignore-start
+        throw Exception(
+          'Search string "${entry.key}" not found in file "$file"',
+        );
+        // coverage:ignore-end
+      }
+
+      content = content.replaceAll(pattern, entry.value);
     }
 
-    final updatedContent = content.replaceAll(pattern, replace);
-    File(file).writeAsStringSync(updatedContent);
+    File(file).writeAsStringSync(content);
   }
 
   // ...........................................................................
@@ -376,18 +399,14 @@ class _CreateDartPackage {
     log('Prepare pubspec.yaml...');
     final pubspecFile = join(packageDir, 'pubspec.yaml');
 
-    // Write repository into file
     _replaceInFile(
       pubspecFile,
-      r'^#\srepository:.*',
-      'repository: $gitHubRepo/$packageName',
-    );
-
-    // Update description
-    _replaceInFile(
-      pubspecFile,
-      r'^description:.*',
-      'description: $description',
+      {
+        r'^#\srepository:.*': 'repository: $gitHubRepo/$packageName',
+        r'^description:.*': 'description: $description',
+        r'^# Add regular dependencies here.\n': '',
+        r'  # path:': '  path:',
+      },
     );
   }
 
@@ -402,6 +421,14 @@ class _CreateDartPackage {
   }
 
   // ...........................................................................
+  void _prepareLaunchJson() {
+    log('Prepare launch.json...');
+    final launchJsonFile = join(packageDir, '.vscode', 'launch.json');
+    final content = launchJson(packageName: packageName);
+    File(launchJsonFile).writeAsStringSync(content);
+  }
+
+  // ...........................................................................
   void _prepareChangeLog() {
     log('Prepare CHANGELOG.md...');
     final changeLogFile = File(join(packageDir, 'CHANGELOG.md'));
@@ -413,29 +440,134 @@ class _CreateDartPackage {
   }
 
   // ...........................................................................
+  void _preapreSrc() {
+    log('Prepare src ...');
+    final implementationFile =
+        join(packageDir, 'lib', 'src', '$packageName.dart');
+    final implementationSnippet = srcDart(packageName: packageName);
+    final content = formatter.format('$fileHeader\n\n$implementationSnippet\n');
+    File(implementationFile).writeAsStringSync(content);
+  }
+
+  // ...........................................................................
+  void _prepareBin() {
+    log('Prepare bin ...');
+    final binFolder = join(packageDir, 'bin');
+    Directory(binFolder).createSync();
+    final binFile = join(binFolder, '$packageName.dart');
+    var binFileContent = binDart(
+      packageName: packageName,
+      description: description,
+    );
+    const makeExecutable = '#!/usr/bin/env dart\n';
+
+    binFileContent = '$makeExecutable$fileHeader\n\n$binFileContent\n';
+    binFileContent = formatter.format(binFileContent);
+
+    File(binFile).writeAsStringSync(binFileContent);
+
+    // Execute chmod +x bin/$packageName.dart
+    final result = Process.runSync(
+      'chmod',
+      ['+x', binFile],
+    );
+
+    if (result.exitCode != 0) {
+      // coverage:ignore-start
+      throw Exception('Error while running "chmod +x $binFile"');
+      // coverage:ignore-end
+    }
+  }
+
+  // ...........................................................................
+  void _prepareTest() {
+    log('Prepare test folder...');
+    final testFolder = join(packageDir, 'test');
+    Directory(testFolder).createSync();
+    final testFile = join(testFolder, '${packageName}_test.dart');
+    final testFileContent = testDart(packageName: packageName);
+    final content = formatter.format('$fileHeader\n\n$testFileContent\n');
+    File(testFile).writeAsStringSync(content);
+  }
+
+  // ...........................................................................
+  void _prepareExample() {
+    log('Prepare example folder...');
+    final exampleFolder = join(packageDir, 'example');
+    Directory(exampleFolder).createSync();
+    final exampleFile =
+        join(exampleFolder, '${packageName.snakeCase}_example.dart');
+
+    final exampleFileContent = exampleDart(packageName: packageName);
+    final content = formatter.format('$fileHeader\n\n$exampleFileContent\n');
+    File(exampleFile).writeAsStringSync(content);
+  }
+
+  // ...........................................................................
+  void _removeUnusedFiles() {
+    log('Remove unused files...');
+    final packageNameSnakeCase = packageName.snakeCase;
+    final files = [
+      join(packageDir, 'lib', 'src', '${packageNameSnakeCase}_base.dart'),
+    ];
+
+    for (final file in files) {
+      if (File(file).existsSync()) {
+        File(file).deleteSync();
+      }
+    }
+  }
+
+  // ...........................................................................
+  void _prepareLib() {
+    log('Prepare lib folder...');
+    final libFolder = join(packageDir, 'lib');
+    final libDartFile = join(libFolder, '$packageName.dart');
+    final libDartContent = libDart(packageName: packageName);
+    final content = formatter.format('$fileHeader\n\n$libDartContent\n');
+    File(libDartFile).writeAsStringSync(content);
+  }
+
+  // ...........................................................................
   void _installDependencies() {
     log('Install dependencies...');
-    // Execute "dart pub add --dev args coverage pana yaml"
     final result = Process.runSync(
       'dart',
-      ['pub', 'add', '--dev', 'args', 'coverage', 'pana', 'yaml'],
+      ['pub', 'add', 'args', 'colorize'],
       workingDirectory: packageDir,
     );
+
     if (result.exitCode != 0) {
       // coverage:ignore-start
       throw Exception(
-        'Error while running "dart pub add --dev args coverage pana yaml"',
+        'Error while running "dart pub add args colorize"',
       );
       // coverage:ignore-end
     }
   }
 
   // ...........................................................................
-  void _prepareBaseDart() {
-    log('Prepare base_dart.dart...');
-    final baseDart = join(packageDir, 'lib', 'src', '${packageName}_base.dart');
-    final content = '$fileHeader\n\n$baseDartSnippet\n';
-    File(baseDart).writeAsStringSync(content);
+  void _installDevDependencies() {
+    log('Install dev dependencies...');
+    final result = Process.runSync(
+      'dart',
+      ['pub', 'add', '--dev', 'coverage', 'pana', 'yaml'],
+      workingDirectory: packageDir,
+    );
+
+    if (result.exitCode != 0) {
+      // coverage:ignore-start
+      throw Exception(
+        'Error while running "dart pub add --dev coverage pana yaml"',
+      );
+      // coverage:ignore-end
+    }
+  }
+
+  // ...........................................................................
+  Future<void> _waitShortly() async {
+    log('Wait a moment...');
+    await Future<void>.delayed(const Duration(milliseconds: 500));
   }
 
   // ...........................................................................
