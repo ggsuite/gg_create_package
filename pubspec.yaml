@@ -1,7 +1,7 @@
 name: aud_cli_create_dart_package
 description: The audanika developer command line
 version: 1.0.0
-repository: https://github.com/inlavigo/aud
+repository: https://github.com/inlavigo/aud_cli_create_dart_package
 
 environment:
   sdk: ^3.2.0
