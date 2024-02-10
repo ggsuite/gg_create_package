@@ -31,7 +31,7 @@ class CreateDartPackage extends Command<dynamic> {
       'output',
       abbr: 'o',
       help: 'Output directory',
-      defaultsTo: checkoutDirectory(),
+      defaultsTo: '.',
     );
 
     // Add the package name option
@@ -85,7 +85,9 @@ class CreateDartPackage extends Command<dynamic> {
   @override
   void run() async {
     // Get the output directory
-    final outputDir = (argResults?['output'] as String).trim();
+    final tmp = (argResults?['output'] as String).trim();
+    final outputDir = tmp == '.' ? checkoutDirectory() : tmp;
+
     final packageName = (argResults?['name'] as String).trim();
     final description = (argResults?['description'] as String).trim();
 
