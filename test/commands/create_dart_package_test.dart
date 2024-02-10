@@ -8,15 +8,15 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:aud_cli_create_dart_package/src/commands/create_dart_package.dart';
-import 'package:aud_cli_create_dart_package/src/snippets/file_header.dart';
-import 'package:aud_cli_create_dart_package/src/snippets/open_source_licence.dart';
-import 'package:aud_cli_create_dart_package/src/snippets/private_license.dart';
+import 'package:aud_cli_create_dart_package/src/snippets/file_header_snippet.dart';
+import 'package:aud_cli_create_dart_package/src/snippets/open_source_licence_snippet.dart';
+import 'package:aud_cli_create_dart_package/src/snippets/private_license_snippet.dart';
 import 'package:aud_cli_create_dart_package/src/tools.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final tempDir = Directory('/tmp'); // Directory.systemTemp;;
+  final tempDir = Directory.systemTemp; // Directory('/tmp');
   final logMessages = <String>[];
   const String description = 'This is a description of the package. '
       'It should be at least 60 characters long.';
@@ -269,7 +269,7 @@ void main() {
       // because it is not open source
       expect(
         File(join(tempPackageDir.path, 'LICENSE')).readAsStringSync(),
-        privateLicence,
+        privateLicenceSnippet,
       );
 
       // .................................
@@ -342,7 +342,7 @@ void main() {
       expect(binFile.existsSync(), isTrue);
       final binFileContent = binFile.readAsStringSync();
       expect(binFileContent, startsWith('#!/usr/bin/env dart\n'));
-      expect(binFileContent, contains(fileHeader));
+      expect(binFileContent, contains(fileHeaderSnippet));
       expect(
         binFileContent,
         contains('import \'package:aud_test/aud_test.dart\';'),
@@ -421,7 +421,7 @@ void main() {
       // because it is not open source
       expect(
         File(join(tempPackageDir.path, 'LICENSE')).readAsStringSync(),
-        openSourceLicense,
+        openSourceLicenseSnippet,
       );
     });
   });

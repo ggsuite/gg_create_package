@@ -7,7 +7,7 @@
 import 'package:recase/recase.dart';
 
 /// The snippet for the lib/dart file
-String libDart({required String packageName}) {
+String libSnippet({required String packageName}) {
   final packageNameSnakeCase = packageName.snakeCase;
 
   return '''

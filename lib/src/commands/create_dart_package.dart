@@ -11,15 +11,15 @@ import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart';
 import 'package:recase/recase.dart';
 
-import '../snippets/bin_dart.dart';
-import '../snippets/example_dart.dart';
-import '../snippets/file_header.dart';
-import '../snippets/launch_json.dart';
-import '../snippets/lib_dart.dart';
-import '../snippets/open_source_licence.dart';
-import '../snippets/private_license.dart';
-import '../snippets/src_dart.dart';
-import '../snippets/test_dart.dart';
+import '../snippets/bin_snippet.dart';
+import '../snippets/example_snippet.dart';
+import '../snippets/file_header_snippet.dart';
+import '../snippets/launch_json_snippet.dart';
+import '../snippets/lib_snippet.dart';
+import '../snippets/open_source_licence_snippet.dart';
+import '../snippets/private_license_snippet.dart';
+import '../snippets/src_snippet.dart';
+import '../snippets/test_snippet.dart';
 import '../tools.dart';
 
 /// Creates a new package in the given directory.
@@ -335,8 +335,9 @@ class _CreateDartPackage {
   // ...........................................................................
   void _copyLicense() {
     log('Copy LICENSE...');
-    final license = (isOpenSource ? openSourceLicense : privateLicence)
-        .replaceAll('YEAR', DateTime.now().year.toString());
+    final license =
+        (isOpenSource ? openSourceLicenseSnippet : privateLicenceSnippet)
+            .replaceAll('YEAR', DateTime.now().year.toString());
 
     File(join(packageDir, 'LICENSE')).writeAsStringSync(license);
   }
@@ -424,7 +425,7 @@ class _CreateDartPackage {
   void _prepareLaunchJson() {
     log('Prepare launch.json...');
     final launchJsonFile = join(packageDir, '.vscode', 'launch.json');
-    final content = launchJson(packageName: packageName);
+    final content = launchJsonSnippet(packageName: packageName);
     File(launchJsonFile).writeAsStringSync(content);
   }
 
@@ -444,8 +445,9 @@ class _CreateDartPackage {
     log('Prepare src ...');
     final implementationFile =
         join(packageDir, 'lib', 'src', '$packageName.dart');
-    final implementationSnippet = srcDart(packageName: packageName);
-    final content = formatter.format('$fileHeader\n\n$implementationSnippet\n');
+    final implementationSnippet = srcSnippet(packageName: packageName);
+    final content =
+        formatter.format('$fileHeaderSnippet\n\n$implementationSnippet\n');
     File(implementationFile).writeAsStringSync(content);
   }
 
@@ -455,13 +457,13 @@ class _CreateDartPackage {
     final binFolder = join(packageDir, 'bin');
     Directory(binFolder).createSync();
     final binFile = join(binFolder, '$packageName.dart');
-    var binFileContent = binDart(
+    var binFileContent = binSnippet(
       packageName: packageName,
       description: description,
     );
     const makeExecutable = '#!/usr/bin/env dart\n';
 
-    binFileContent = '$makeExecutable$fileHeader\n\n$binFileContent\n';
+    binFileContent = '$makeExecutable$fileHeaderSnippet\n\n$binFileContent\n';
     binFileContent = formatter.format(binFileContent);
 
     File(binFile).writeAsStringSync(binFileContent);
@@ -485,8 +487,9 @@ class _CreateDartPackage {
     final testFolder = join(packageDir, 'test');
     Directory(testFolder).createSync();
     final testFile = join(testFolder, '${packageName}_test.dart');
-    final testFileContent = testDart(packageName: packageName);
-    final content = formatter.format('$fileHeader\n\n$testFileContent\n');
+    final testFileContent = testSnippet(packageName: packageName);
+    final content =
+        formatter.format('$fileHeaderSnippet\n\n$testFileContent\n');
     File(testFile).writeAsStringSync(content);
   }
 
@@ -498,8 +501,9 @@ class _CreateDartPackage {
     final exampleFile =
         join(exampleFolder, '${packageName.snakeCase}_example.dart');
 
-    final exampleFileContent = exampleDart(packageName: packageName);
-    final content = formatter.format('$fileHeader\n\n$exampleFileContent\n');
+    final exampleFileContent = exampleSnippet(packageName: packageName);
+    final content =
+        formatter.format('$fileHeaderSnippet\n\n$exampleFileContent\n');
     File(exampleFile).writeAsStringSync(content);
   }
 
@@ -523,8 +527,8 @@ class _CreateDartPackage {
     log('Prepare lib folder...');
     final libFolder = join(packageDir, 'lib');
     final libDartFile = join(libFolder, '$packageName.dart');
-    final libDartContent = libDart(packageName: packageName);
-    final content = formatter.format('$fileHeader\n\n$libDartContent\n');
+    final libDartContent = libSnippet(packageName: packageName);
+    final content = formatter.format('$fileHeaderSnippet\n\n$libDartContent\n');
     File(libDartFile).writeAsStringSync(content);
   }
 

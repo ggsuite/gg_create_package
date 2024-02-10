@@ -13,7 +13,7 @@
 import 'package:recase/recase.dart';
 
 /// The snippet for the bin/dart file
-String binDart({
+String binSnippet({
   required String packageName,
   required String description,
 }) {

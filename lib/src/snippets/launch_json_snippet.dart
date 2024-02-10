@@ -7,7 +7,7 @@
 import 'package:recase/recase.dart';
 
 /// Creates a launchJson snippet
-String launchJson({required String packageName}) {
+String launchJsonSnippet({required String packageName}) {
   final packageNamePascalCase = packageName.pascalCase;
   final packageNameCamelCase = packageName.camelCase;
   final packageNameSnakeCase = packageName.snakeCase;
