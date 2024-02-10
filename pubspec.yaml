@@ -1,19 +1,19 @@
 name: aud_cli_create_dart_package
-description: Audanika Developer Command Line - Create Dart Packages on Ease
+description: The audanika developer command line
 version: 1.0.0
-repository: https://github.com/inlavigo/aud_cli_create_dart_package
+repository: https://github.com/inlavigo/aud
 
 environment:
-  sdk: ^3.4.0-120.0.dev
+  sdk: ^3.2.0
 
 # Add regular dependencies here.
 dependencies:
-  # path: ^1.8.0
+  path: ^1.8.0
+  args: ^2.4.2
 
 dev_dependencies:
-  args: ^2.4.2
   coverage: ^1.7.2
   lints: ^3.0.0
-  pana: ^0.22.0
+  pana: ^0.21.45
   test: ^1.24.0
   yaml: ^3.1.2

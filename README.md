@@ -1,3 +1,3 @@
-# aud_cli_create_dart_package
+# Aud
 
-Audanika Developer Command Line - Create Dart Packages on Ease
+The audanika developer command line

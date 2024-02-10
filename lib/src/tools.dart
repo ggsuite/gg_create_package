@@ -4,8 +4,9 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-/// Checks if you are awesome. Spoiler: you are.
-class Awesome {
-  /// Returns true
-  bool get isAwesome => true;
-}
+library;
+
+export 'tools/aud_cli_directory.dart';
+export 'tools/checkout_directory.dart';
+export 'tools/is_github_action.dart';
+export 'tools/color.dart';
