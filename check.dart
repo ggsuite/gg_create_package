@@ -1,6 +1,7 @@
 #!/usr/bin/env dart
 
 import 'dart:io';
+import 'package:dart_ping/dart_ping.dart';
 import 'package:yaml/yaml.dart';
 
 import 'package:args/args.dart';
@@ -25,6 +26,26 @@ void loadConfig() {
   }
 
   yaml = loadYaml(file.readAsStringSync());
+}
+
+// .........................................................................
+/// Returns true if the internet is available
+Future<bool> hasInternet() async {
+  // If GitHub is not available, skip test.
+  final isGitHubAvailable =
+      (await Ping('github.com').stream.first).error == null;
+
+  return isGitHubAvailable;
+}
+
+// .............................................................................
+Future<void> checkInternet() async {
+  if (yaml['needsInternet'] == true) {
+    if (!await hasInternet()) {
+      print('❌ This package needs internet. Abort.');
+      exit(1);
+    }
+  }
 }
 
 // .............................................................................
@@ -114,6 +135,8 @@ Future<int> main(List<String> arguments) async {
   parseArgs(arguments);
   loadConfig();
   print('');
+
+  await checkInternet();
 
   await check(
     name: 'analyze',

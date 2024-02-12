@@ -1,3 +1,4 @@
+needsInternet: true
 analyze:
   execute: true
 format:

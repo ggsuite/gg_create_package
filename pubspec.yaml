@@ -13,6 +13,7 @@ dependencies:
   colorize: ^3.0.0
   recase: ^4.1.0
   dart_style: ^2.3.4
+  dart_ping: ^9.0.1
 
 dev_dependencies:
   coverage: ^1.7.2

@@ -577,14 +577,14 @@ class _CreateDartPackage {
     log('Install dev dependencies...');
     final result = Process.runSync(
       'dart',
-      ['pub', 'add', '--dev', 'coverage', 'pana', 'yaml'],
+      ['pub', 'add', '--dev', 'coverage', 'pana', 'yaml', 'dart_ping'],
       workingDirectory: packageDir,
     );
 
     if (result.exitCode != 0) {
       // coverage:ignore-start
       throw Exception(
-        'Error while running "dart pub add --dev coverage pana yaml"',
+        'Error while running "dart pub add --dev coverage pana yaml dart_ping"',
       );
       // coverage:ignore-end
     }
