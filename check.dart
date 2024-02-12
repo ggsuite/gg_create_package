@@ -13,6 +13,7 @@ import 'package:args/args.dart';
 var isGitHub = Platform.environment.containsKey('GITHUB_ACTIONS');
 var hasErrors = false;
 var verbose = true;
+var exitOnError = true;
 var printAnnouncement = !isGitHub;
 final errorMessages = <String>[];
 dynamic yaml;
@@ -100,6 +101,10 @@ Future<bool> check({
       print(result.stdout.toString());
       print(result.stderr.toString());
     }
+
+    if (exitOnError) {
+      exit(1);
+    }
   }
   return success;
 }
@@ -107,7 +112,12 @@ Future<bool> check({
 // .............................................................................
 void parseArgs(List<String> arguments) {
   final parser = ArgParser()
-    ..addFlag('verbose', negatable: false, abbr: 'v')
+    ..addFlag(
+      'verbose',
+      negatable: false,
+      abbr: 'v',
+      defaultsTo: true,
+    )
     ..addFlag(
       'help',
       negatable: false,
@@ -148,6 +158,12 @@ Future<int> main(List<String> arguments) async {
     name: 'format',
     command: 'dart format lib --output=none --set-exit-if-changed',
     message: 'dart format',
+  );
+
+  await check(
+    name: 'test',
+    command: 'dart check_test.dart',
+    message: 'dart check_test.dart',
   );
 
   await check(

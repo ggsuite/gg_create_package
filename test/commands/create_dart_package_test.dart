@@ -290,7 +290,7 @@ void main() {
       // ...............................
       // Github actions should be copied
       final gitHubAction =
-          File(join(tempPackageDir.path, '.github/workflows/check.yaml'));
+          File(join(tempPackageDir.path, '.github/workflows/pipeline.yaml'));
       expect(gitHubAction.existsSync(), isTrue);
 
       // ..........................
