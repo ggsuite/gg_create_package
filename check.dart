@@ -42,7 +42,7 @@ Future<bool> hasInternet() async {
 // .............................................................................
 Future<void> checkInternet() async {
   if (yaml['needsInternet'] == true) {
-    if (!await hasInternet()) {
+    if (!isGitHub && !await hasInternet()) {
       print('❌ This package needs internet. Abort.');
       exit(1);
     }
