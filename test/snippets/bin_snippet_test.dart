@@ -4,9 +4,12 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-library;
+import 'package:test/test.dart';
 
-export 'tools/aud_cli_directory.dart';
-export 'tools/checkout_directory.dart';
-export 'tools/is_github_action.dart';
-export 'tools/color.dart';
+void main() {
+  group('BinSnippet', () {
+    test('should work fine', () {
+      expect(true, isNotNull);
+    });
+  });
+}

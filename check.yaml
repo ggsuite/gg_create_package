@@ -3,9 +3,7 @@ analyze:
   execute: true
 format:
   execute: true
-test:
-  execute: true
-coverage:
+tests:
   execute: true
 pana:
   execute: false

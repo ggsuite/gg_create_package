@@ -9,6 +9,10 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:aud_cli_create_dart_package/src/snippets/install_snippet.dart';
 import 'package:aud_cli_create_dart_package/src/snippets/make_executable_snippet.dart';
+import 'package:aud_cli_create_dart_package/src/tools/aud_cli_directory.dart';
+import 'package:aud_cli_create_dart_package/src/tools/checkout_directory.dart';
+import 'package:aud_cli_create_dart_package/src/tools/color.dart';
+import 'package:aud_cli_create_dart_package/src/tools/is_github_action.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart';
 import 'package:recase/recase.dart';
@@ -22,7 +26,6 @@ import '../snippets/open_source_licence_snippet.dart';
 import '../snippets/private_license_snippet.dart';
 import '../snippets/src_snippet.dart';
 import '../snippets/test_snippet.dart';
-import '../tools.dart';
 
 /// Creates a new package in the given directory.
 class CreateDartPackage extends Command<dynamic> {
@@ -577,7 +580,16 @@ class _CreateDartPackage {
     log('Install dev dependencies...');
     final result = Process.runSync(
       'dart',
-      ['pub', 'add', '--dev', 'coverage', 'pana', 'yaml', 'dart_ping'],
+      [
+        'pub',
+        'add',
+        '--dev',
+        'coverage',
+        'pana',
+        'yaml',
+        'dart_ping',
+        'recase',
+      ],
       workingDirectory: packageDir,
     );
 

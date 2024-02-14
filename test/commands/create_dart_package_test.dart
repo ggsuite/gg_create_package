@@ -11,7 +11,8 @@ import 'package:aud_cli_create_dart_package/src/commands/create_dart_package.dar
 import 'package:aud_cli_create_dart_package/src/snippets/file_header_snippet.dart';
 import 'package:aud_cli_create_dart_package/src/snippets/open_source_licence_snippet.dart';
 import 'package:aud_cli_create_dart_package/src/snippets/private_license_snippet.dart';
-import 'package:aud_cli_create_dart_package/src/tools.dart';
+import 'package:aud_cli_create_dart_package/src/tools/color.dart';
+import 'package:aud_cli_create_dart_package/src/tools/is_github_action.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 
@@ -280,7 +281,7 @@ void main() {
         'check.yaml',
         'check_pana.dart',
         'check.dart',
-        'check_coverage.dart',
+        'check_tests.dart',
       ];
 
       for (final checkFile in checkFiles) {

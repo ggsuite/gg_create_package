@@ -34,7 +34,7 @@ void loadConfig() {
 Future<bool> hasInternet() async {
   // If GitHub is not available, skip test.
   final isGitHubAvailable =
-      (await Ping('github.com').stream.first).error == null;
+      isGitHub || (await Ping('github.com').stream.first).error == null;
 
   return isGitHubAvailable;
 }
@@ -42,7 +42,7 @@ Future<bool> hasInternet() async {
 // .............................................................................
 Future<void> checkInternet() async {
   if (yaml['needsInternet'] == true) {
-    if (!isGitHub && !await hasInternet()) {
+    if (!await hasInternet()) {
       print('❌ This package needs internet. Abort.');
       exit(1);
     }
@@ -90,16 +90,21 @@ Future<bool> check({
   final parts = command.split(' ');
   final cmd = parts.first;
   final List<String> arguments = parts.length > 1 ? parts.sublist(1) : [];
-  final result = await Process.run(cmd, arguments);
+  final result = await Process.run(cmd, arguments, runInShell: true);
   final success = result.exitCode == 0;
 
   printResult(message: message ?? cmd, success: result.exitCode == 0);
 
   if (!success) {
-    hasErrors = true;
-    if (verbose) {
-      print(result.stdout.toString());
-      print(result.stderr.toString());
+    final errorMsg = result.stderr.toString();
+    final stdoutMsg = result.stdout.toString();
+
+    if (errorMsg.isNotEmpty) {
+      stderr.writeln('Errors:');
+      stderr.writeln(result.stderr.toString());
+    }
+    if (stdoutMsg.isNotEmpty) {
+      stderr.writeln(result.stdout.toString());
     }
 
     if (exitOnError) {
@@ -161,15 +166,9 @@ Future<int> main(List<String> arguments) async {
   );
 
   await check(
-    name: 'test',
-    command: 'dart check_test.dart',
-    message: 'dart check_test.dart',
-  );
-
-  await check(
-    name: 'coverage',
-    command: 'dart check_coverage.dart',
-    message: 'dart check_coverage.dart',
+    name: 'tests',
+    command: 'dart check_tests.dart',
+    message: 'dart check_tests.dart',
   );
 
   await check(
