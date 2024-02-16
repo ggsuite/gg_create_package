@@ -6,4 +6,4 @@
 
 library;
 
-export './src/commands/create_dart_package.dart';
+export 'src/commands/create_package.dart';

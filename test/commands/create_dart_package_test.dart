@@ -7,12 +7,12 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:aud_cli_create_dart_package/src/commands/create_dart_package.dart';
-import 'package:aud_cli_create_dart_package/src/snippets/file_header_snippet.dart';
-import 'package:aud_cli_create_dart_package/src/snippets/open_source_licence_snippet.dart';
-import 'package:aud_cli_create_dart_package/src/snippets/private_license_snippet.dart';
-import 'package:aud_cli_create_dart_package/src/tools/color.dart';
-import 'package:aud_cli_create_dart_package/src/tools/is_github_action.dart';
+import 'package:gg_cli_cp/src/commands/create_package.dart';
+import 'package:gg_cli_cp/src/snippets/file_header_snippet.dart';
+import 'package:gg_cli_cp/src/snippets/open_source_licence_snippet.dart';
+import 'package:gg_cli_cp/src/snippets/private_license_snippet.dart';
+import 'package:gg_cli_cp/src/tools/color.dart';
+import 'package:gg_cli_cp/src/tools/is_github_action.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 
@@ -45,17 +45,17 @@ void main() {
   final r = CommandRunner<dynamic>(
     'aud',
     'Our cli to manage many tasks about audanika software development.',
-  )..addCommand(CreateDartPackage(log: log));
+  )..addCommand(CreatePackage(log: log));
 
   // ...........................................................................
 
-  group('CreateDartPackage', () {
+  group('cp', () {
     // #########################################################################
     test('should throw when target directory does not exist', () async {
       // Expect throws exception
       expectLater(
         r.run([
-          'createDartPackage',
+          'cp',
           '-o',
           'some unknown directory',
           '-n',
@@ -79,7 +79,7 @@ void main() {
       // Expect throws exception
       expectLater(
         r.run([
-          'createDartPackage',
+          'cp',
           '-o',
           tempDir.path,
           '-n',
@@ -109,7 +109,7 @@ void main() {
       // Expect throws exception
       expect(
         r.run([
-          'createDartPackage',
+          'cp',
           '-o',
           tempDir.path,
           '-n',
@@ -136,7 +136,7 @@ void main() {
       // Expect throws exception
       expect(
         r.run([
-          'createDartPackage',
+          'cp',
           '-o',
           tempDir.path,
           '-n',
@@ -163,7 +163,7 @@ void main() {
       // Expect throws exception
       expect(
         r.run([
-          'createDartPackage',
+          'cp',
           '-o',
           tempDir.path,
           '-n',
@@ -193,7 +193,7 @@ void main() {
 
       // Expect does not throw exception because --force is given
       await r.run([
-        'createDartPackage',
+        'cp',
         '-o',
         tempDir.path,
         '-n',
@@ -279,9 +279,6 @@ void main() {
       final checkFiles = [
         'check',
         'check.yaml',
-        'check_pana.dart',
-        'check.dart',
-        'check_tests.dart',
       ];
 
       for (final checkFile in checkFiles) {
@@ -414,7 +411,7 @@ void main() {
 
       // Expect does not throw exception
       await r.run([
-        'createDartPackage',
+        'cp',
         '-o',
         tempDir.path,
         '-n',

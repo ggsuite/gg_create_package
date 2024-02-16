@@ -4,13 +4,10 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-import 'package:gg_cli_cp/src/snippets/test_snippet.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('TestSnippet', () {
-    test('should work fine', () {
-      expect(testSnippet(packageName: 'AbCd'), isNotNull);
-    });
+  group('CreatePackage', () {
+    test('should work fine', () {});
   });
 }

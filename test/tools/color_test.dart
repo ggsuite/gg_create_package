@@ -4,7 +4,7 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-import 'package:aud_cli_create_dart_package/src/tools/color.dart';
+import 'package:gg_cli_cp/src/tools/color.dart';
 import 'package:test/test.dart';
 
 void main() {

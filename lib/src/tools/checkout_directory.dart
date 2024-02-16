@@ -6,10 +6,10 @@
 
 import 'dart:io';
 
-import 'package:aud_cli_create_dart_package/src/tools/aud_cli_directory.dart';
+import 'package:gg_cli_cp/src/tools/gg_directory.dart';
 
 /// Returns the directory the checkouts need to be done
 String checkoutDirectory() {
   // Get the current working directory
-  return Directory(audCliDirectory()).parent.absolute.path;
+  return Directory(ggDirectory()).parent.absolute.path;
 }

@@ -6,7 +6,7 @@
 
 import 'dart:io';
 
-import 'package:aud_cli_create_dart_package/src/tools/aud_cli_directory.dart';
+import 'package:gg_cli_cp/src/tools/gg_directory.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -22,37 +22,37 @@ void main() {
     group('should return the current project directory', () {
       test(
           'when the current working directory is the '
-          'aud_cli_create_dart_package directory', () {
+          'gg_cli_cp directory', () {
         // Expect the current working directory to end with
-        // 'aud_cli_create_dart_package'
-        expect(audCliDirectory(), endsWith('aud_cli_create_dart_package'));
+        // 'gg_cli_cp'
+        expect(ggDirectory(), endsWith('gg_cli_cp'));
       });
 
       test(
           'when the current working directory is the parent dir of '
-          'aud_cli_create_dart_package', () {
+          'gg_cli_cp', () {
         // Change the current working directory to the parent dir of
-        // aud_cli_create_dart_package
+        // gg_cli_cp
         Directory.current = Directory.current.parent;
-        expect(audCliDirectory(), endsWith('aud_cli_create_dart_package'));
+        expect(ggDirectory(), endsWith('gg_cli_cp'));
       });
     });
 
     test(
         'should throw when the current working dir '
-        'is not checkout dir or aud_cli_create_dart_package dir', () {
+        'is not checkout dir or gg_cli_cp dir', () {
       // Change the current working dir to the grandparent dir of
-      // aud_cli_create_dart_package
+      // gg_cli_cp
       Directory.current = Directory.systemTemp;
       expect(
-        () => audCliDirectory(),
+        () => ggDirectory(),
         throwsA(
           isA<Exception>().having(
             (e) => e.toString(),
             'message',
             'Exception: The current directory needs to be '
                 'either a subdirectory or the direct parent directory '
-                'of aud_cli_create_dart_package.',
+                'of gg_cli_cp.',
           ),
         ),
       );

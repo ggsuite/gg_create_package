@@ -7,12 +7,12 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:aud_cli_create_dart_package/src/snippets/install_snippet.dart';
-import 'package:aud_cli_create_dart_package/src/snippets/make_executable_snippet.dart';
-import 'package:aud_cli_create_dart_package/src/tools/aud_cli_directory.dart';
-import 'package:aud_cli_create_dart_package/src/tools/checkout_directory.dart';
-import 'package:aud_cli_create_dart_package/src/tools/color.dart';
-import 'package:aud_cli_create_dart_package/src/tools/is_github_action.dart';
+import 'package:gg_cli_cp/src/snippets/install_snippet.dart';
+import 'package:gg_cli_cp/src/snippets/make_executable_snippet.dart';
+import 'package:gg_cli_cp/src/tools/gg_directory.dart';
+import 'package:gg_cli_cp/src/tools/checkout_directory.dart';
+import 'package:gg_cli_cp/src/tools/color.dart';
+import 'package:gg_cli_cp/src/tools/is_github_action.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart';
 import 'package:recase/recase.dart';
@@ -28,17 +28,17 @@ import '../snippets/src_snippet.dart';
 import '../snippets/test_snippet.dart';
 
 /// Creates a new package in the given directory.
-class CreateDartPackage extends Command<dynamic> {
+class CreatePackage extends Command<dynamic> {
   /// The name of the package
   @override
-  final name = 'createDartPackage';
+  final name = 'cp';
 
   /// The description shown when running `aud help createDartPackage`.
   @override
-  final description = 'Creates a new dart package for our repository';
+  final description = 'Creates a new dart package.';
 
   /// Constructor
-  CreateDartPackage({
+  CreatePackage({
     this.log,
   }) {
     // Add the output option
@@ -293,7 +293,7 @@ class _CreateDartPackage {
     // Copy over VScode which are located in project/.vscode
     log('Copy VSCode settings...');
 
-    final vscodeDir = join(audCliDirectory(), '.vscode');
+    final vscodeDir = join(ggDirectory(), '.vscode');
     final targetVscodeDir = join(packageDir, '.vscode');
     _copyDirectory(vscodeDir, targetVscodeDir);
   }
@@ -324,7 +324,7 @@ class _CreateDartPackage {
   void _copyGitIgnore() {
     log('Copy .gitignore...');
     _copyFile(
-      join(audCliDirectory(), '.gitignore'),
+      join(ggDirectory(), '.gitignore'),
       join(packageDir, '.gitignore'),
     );
   }
@@ -333,7 +333,7 @@ class _CreateDartPackage {
   void _copyAnalysisOptions() {
     log('Copy analysis_options.yaml...');
     _copyFile(
-      join(audCliDirectory(), 'analysis_options.yaml'),
+      join(ggDirectory(), 'analysis_options.yaml'),
       join(packageDir, 'analysis_options.yaml'),
     );
   }
@@ -352,7 +352,7 @@ class _CreateDartPackage {
   void _copyChecks() {
     log('Copy checks...');
     // Get all files in the aud_cli directory starting with check
-    final audCliDir = audCliDirectory();
+    final audCliDir = ggDirectory();
     final files = Directory(join(audCliDir))
         .listSync()
         .whereType<File>()
@@ -376,7 +376,7 @@ class _CreateDartPackage {
   void _copyGitHubActions() {
     log('Copy GitHub Actions...');
     // Copy over GitHub Actions
-    final githubActionsDir = join(audCliDirectory(), '.github');
+    final githubActionsDir = join(ggDirectory(), '.github');
     final targetGitHubActionsDir = join(packageDir, '.github');
     _copyDirectory(githubActionsDir, targetGitHubActionsDir);
   }

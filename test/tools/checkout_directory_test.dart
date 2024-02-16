@@ -6,7 +6,7 @@
 
 import 'dart:io';
 
-import 'package:aud_cli_create_dart_package/src/tools/checkout_directory.dart';
+import 'package:gg_cli_cp/src/tools/checkout_directory.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 
@@ -14,14 +14,12 @@ void main() {
   group('getCheckOutDir', () {
     // #########################################################################
 
-    test(
-        'should return the parent of the aud_cli_create_dart_package directory',
-        () {
+    test('should return the parent of the gg_cli_cp directory', () {
       final checkOutDir = checkoutDirectory();
       expect(Directory(checkOutDir).existsSync(), isTrue);
 
-      final audCliDir = join(checkOutDir, 'aud_cli_create_dart_package');
-      expect(Directory(audCliDir).existsSync(), isTrue);
+      final ggDir = join(checkOutDir, 'gg_cli_cp');
+      expect(Directory(ggDir).existsSync(), isTrue);
     });
   });
 }

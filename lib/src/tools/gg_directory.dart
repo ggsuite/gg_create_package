@@ -9,28 +9,31 @@ import 'dart:io';
 import 'package:path/path.dart';
 
 /// Get the project directory
-String audCliDirectory() {
-  const packageName = 'aud_cli_create_dart_package';
+String ggDirectory() {
+  const packageName = 'gg_cli_cp';
 
   // Get the current working directory
   final current = Directory.current.path;
 
-  // Is the current working directory in the checkout dir?
+  // The checkout directory contains all of our repositories
+  // If the currenct directory contains a gg/ directory, we are in the checkout
+  // directory
   final isCheckOutDir = Directory(join(current, packageName)).existsSync();
 
-  // Does the current working directory contain an "aud_cli_create_dart_package"
-  // directory?
-  final isAudCliDir = !isCheckOutDir && current.contains(packageName);
+  // Does the current working directory contain an "gg" directory?
+  final isGgCliCpDir = !isCheckOutDir && (current.contains(packageName));
 
-  // We need to be either within the aud_cli directory or in the checkout dir
-  if (!isAudCliDir && !isCheckOutDir) {
-    throw Exception('The current directory needs to be either a '
-        'subdirectory or the direct parent directory of '
-        'aud_cli_create_dart_package.');
+  // We need to be either within the gg directory or in the checkout dir
+  if (!isGgCliCpDir && !isCheckOutDir) {
+    throw Exception(
+      'The current directory needs to be either a '
+      'subdirectory or the direct parent directory of '
+      'gg_cli_cp.',
+    );
   }
 
   // Estimate the project root
-  final projectRoot = isAudCliDir
+  final projectRoot = isGgCliCpDir
       ? current.substring(
           0,
           current.lastIndexOf(packageName) + packageName.length,
