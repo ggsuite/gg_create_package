@@ -10,7 +10,8 @@ import 'package:test/test.dart';
 void main() {
   group('PrivateLicenseSnippet', () {
     test('should work fine', () {
-      expect(privateLicenceSnippet, isNotNull);
+      final year = DateTime.now().year.toString();
+      expect(privateLicenceSnippet, contains(year));
     });
   });
 }

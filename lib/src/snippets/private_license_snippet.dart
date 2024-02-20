@@ -5,7 +5,7 @@
 // found in the LICENSE file in the root of this package.
 
 /// Private license
-const String privateLicenceSnippet = '''
+final String privateLicenceSnippet = '''
 Copyright (c) 2019 Dr. Gabriel Gatzsche, All Rights Reserved.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -15,4 +15,5 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-''';
+'''
+    .replaceAll('2019', DateTime.now().year.toString());

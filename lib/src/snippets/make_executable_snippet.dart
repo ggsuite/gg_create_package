@@ -6,3 +6,6 @@
 
 /// Add this to files that should be executable.
 const makeExecutableSnippet = '#!/usr/bin/env dart\n';
+
+/// Create coverage
+void createCoverageForMakeExecutableCreate() {}

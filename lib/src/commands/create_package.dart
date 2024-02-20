@@ -98,7 +98,7 @@ class CreatePackage extends Command<dynamic> {
   // ...........................................................................
   /// Runs the command
   @override
-  void run() async {
+  Future<void> run() async {
     // Get the output directory
     final tmp = (argResults?['output'] as String).trim();
     final outputDir = tmp == '.' ? checkoutDirectory() : tmp;
@@ -115,6 +115,10 @@ class CreatePackage extends Command<dynamic> {
 
     final updatedOutputDir = outputDir.replaceAll('~', homeDirectory);
 
+    if (!testReallyExecute) {
+      return;
+    }
+
     await _CreateDartPackage(
       outputDir: updatedOutputDir,
       packageDir: join(updatedOutputDir, packageName),
@@ -126,6 +130,10 @@ class CreatePackage extends Command<dynamic> {
       force: force,
     ).run();
   }
+
+  // ...........................................................................
+  /// Use this to suppress execution of the command.
+  static bool testReallyExecute = true;
 }
 
 // #############################################################################
@@ -584,11 +592,8 @@ class _CreateDartPackage {
         'pub',
         'add',
         '--dev',
-        'coverage',
         'pana',
         'yaml',
-        'dart_ping',
-        'recase',
       ],
       workingDirectory: packageDir,
     );
@@ -596,7 +601,7 @@ class _CreateDartPackage {
     if (result.exitCode != 0) {
       // coverage:ignore-start
       throw Exception(
-        'Error while running "dart pub add --dev coverage pana yaml dart_ping"',
+        'Error while running "dart pub add --dev coverage pana yaml"',
       );
       // coverage:ignore-end
     }
@@ -756,11 +761,11 @@ class _CreateDartPackage {
     }
 
     log('\nSuccess! To open the project with visual studio code, call ');
-    log('${greenStart}code $packageDir$greenEnd\n');
+    log('${greenStart}code $packageDir$end\n');
 
     if (prepareGitHub) {
       log('To push the project to GitHub, call');
-      log('${greenStart}git push -u origin main$greenEnd\n');
+      log('${greenStart}git push -u origin main$end\n');
       log('Happy coding!');
     }
 

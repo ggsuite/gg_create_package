@@ -10,7 +10,8 @@ import 'package:test/test.dart';
 void main() {
   group('MakeExecutableSnippet', () {
     test('should work fine', () {
-      expect(makeExecutableSnippet, isNotNull);
+      createCoverageForMakeExecutableCreate();
+      expect(makeExecutableSnippet, '#!/usr/bin/env dart\n');
     });
   });
 }

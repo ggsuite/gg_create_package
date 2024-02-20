@@ -11,6 +11,7 @@ void main() {
   group('Color', () {
     test('should work fine', () {
       expect(redStart, isNotNull);
+      expect(colorize('Hello', redStart), contains('Hello'));
     });
   });
 }

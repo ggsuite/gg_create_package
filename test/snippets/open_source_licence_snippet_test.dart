@@ -10,7 +10,10 @@ import 'package:test/test.dart';
 void main() {
   group('OpenSourceLicenceSnippet', () {
     test('should work fine', () {
-      expect(openSourceLicenseSnippet, isNotNull);
+      expect(
+        openSourceLicenseSnippet,
+        contains(DateTime.now().year.toString()),
+      );
     });
   });
 }
