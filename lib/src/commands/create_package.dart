@@ -595,7 +595,6 @@ class _CreateDartPackage {
         'add',
         '--dev',
         'pana',
-        'yaml',
       ],
       workingDirectory: packageDir,
     );
@@ -603,7 +602,7 @@ class _CreateDartPackage {
     if (result.exitCode != 0) {
       // coverage:ignore-start
       throw Exception(
-        'Error while running "dart pub add --dev coverage pana yaml"',
+        'Error while running "dart pub add --dev coverage pana"',
       );
       // coverage:ignore-end
     }
