@@ -303,6 +303,10 @@ void main() {
       );
       expect(pubspec.contains(pattern), isTrue);
 
+      // Should add gg command line to repo
+      expect(pubspec, contains(RegExp(r'gg:')));
+      expect(pubspec, contains('git: https://github.com/inlavigo/gg.git'));
+
       // ..............................
       // Should prepare launch.json
       final launchJson =
