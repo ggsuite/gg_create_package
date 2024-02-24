@@ -9,17 +9,38 @@ import 'package:args/command_runner.dart';
 import 'package:gg_cli_cp/create_dart_package.dart';
 import 'package:colorize/colorize.dart';
 
-// #############################################################################
-Future<void> main(List<String> arguments) async {
+// .............................................................................
+Future<void> runCreatePackage({
+  required List<String> args,
+  required void Function(String msg) log,
+}) async {
   try {
-    final r = CommandRunner<dynamic>(
-      'aud',
-      'Our cli to manage many tasks about audanika software development.',
-    )..addCommand(CreatePackage(log: print));
+    final cp = CreatePackage(log: log);
 
-    await r.run(arguments);
-  } catch (e) {
-    final msg = e.toString().replaceAll('Exception: ', '');
-    print(Colorize(msg).red());
+    // Create a command runner
+    final CommandRunner<void> runner = CommandRunner<void>(
+      'GgCliCp',
+      cp.description,
+    );
+
+    runner.addCommand(cp);
+
+    // Run the command
+    await runner.run(args);
   }
+
+  // Print errors in red
+  catch (e) {
+    final msg = e.toString().replaceAll('Exception: ', '');
+    log(Colorize(msg).red().toString());
+    log('Error: $e');
+  }
+}
+
+// .............................................................................
+Future<void> main(List<String> args) async {
+  await runCreatePackage(
+    args: args,
+    log: (msg) => print(msg),
+  );
 }
