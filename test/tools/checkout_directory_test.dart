@@ -6,7 +6,7 @@
 
 import 'dart:io';
 
-import 'package:gg_cli_cp/src/tools/checkout_directory.dart';
+import 'package:gg_create_package/src/tools/checkout_directory.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 
@@ -14,11 +14,11 @@ void main() {
   group('getCheckOutDir', () {
     // #########################################################################
 
-    test('should return the parent of the gg_cli_cp directory', () {
+    test('should return the parent of the gg_create_package directory', () {
       final checkOutDir = checkoutDirectory();
       expect(Directory(checkOutDir).existsSync(), isTrue);
 
-      final ggDir = join(checkOutDir, 'gg_cli_cp');
+      final ggDir = join(checkOutDir, 'gg_create_package');
       expect(Directory(ggDir).existsSync(), isTrue);
     });
   });

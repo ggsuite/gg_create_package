@@ -6,7 +6,7 @@
 
 import 'dart:io';
 
-import 'package:gg_cli_cp/src/tools/is_github_action.dart';
+import 'package:gg_create_package/src/tools/is_github_action.dart';
 import 'package:test/test.dart';
 
 void main() {

@@ -7,12 +7,12 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:gg_cli_cp/src/commands/create_package.dart';
-import 'package:gg_cli_cp/src/snippets/file_header_snippet.dart';
-import 'package:gg_cli_cp/src/snippets/open_source_licence_snippet.dart';
-import 'package:gg_cli_cp/src/snippets/private_license_snippet.dart';
-import 'package:gg_cli_cp/src/tools/color.dart';
-import 'package:gg_cli_cp/src/tools/is_github_action.dart';
+import 'package:gg_create_package/src/commands/create_package.dart';
+import 'package:gg_create_package/src/snippets/file_header_snippet.dart';
+import 'package:gg_create_package/src/snippets/open_source_licence_snippet.dart';
+import 'package:gg_create_package/src/snippets/private_license_snippet.dart';
+import 'package:gg_create_package/src/tools/color.dart';
+import 'package:gg_create_package/src/tools/is_github_action.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 

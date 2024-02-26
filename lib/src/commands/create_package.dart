@@ -7,12 +7,12 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:gg_cli_cp/src/snippets/install_snippet.dart';
-import 'package:gg_cli_cp/src/snippets/make_executable_snippet.dart';
-import 'package:gg_cli_cp/src/tools/gg_directory.dart';
-import 'package:gg_cli_cp/src/tools/checkout_directory.dart';
-import 'package:gg_cli_cp/src/tools/color.dart';
-import 'package:gg_cli_cp/src/tools/is_github_action.dart';
+import 'package:gg_create_package/src/snippets/install_snippet.dart';
+import 'package:gg_create_package/src/snippets/make_executable_snippet.dart';
+import 'package:gg_create_package/src/tools/gg_directory.dart';
+import 'package:gg_create_package/src/tools/checkout_directory.dart';
+import 'package:gg_create_package/src/tools/color.dart';
+import 'package:gg_create_package/src/tools/is_github_action.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart';
 import 'package:recase/recase.dart';
@@ -570,16 +570,18 @@ class _CreateDartPackage {
   // ...........................................................................
   void _installDependencies() {
     log('Install dependencies...');
+    const packages = ['args', 'colorize'];
+    const options = ['pub', 'add', ...packages];
     final result = Process.runSync(
       'dart',
-      ['pub', 'add', 'args', 'colorize'],
+      options,
       workingDirectory: packageDir,
     );
 
     if (result.exitCode != 0) {
       // coverage:ignore-start
       throw Exception(
-        'Error while running "dart pub add args colorize"',
+        'Error while running "dart ${options.join(' ')}"',
       );
       // coverage:ignore-end
     }
@@ -588,21 +590,22 @@ class _CreateDartPackage {
   // ...........................................................................
   void _installDevDependencies() {
     log('Install dev dependencies...');
+    const packages = [
+      'pana',
+    ];
+
+    const options = ['pub', 'add', '--dev', ...packages];
+
     final result = Process.runSync(
       'dart',
-      [
-        'pub',
-        'add',
-        '--dev',
-        'pana',
-      ],
+      options,
       workingDirectory: packageDir,
     );
 
     if (result.exitCode != 0) {
       // coverage:ignore-start
       throw Exception(
-        'Error while running "dart pub add --dev coverage pana"',
+        'Error while running "dart ${options.join(' ')}"',
       );
       // coverage:ignore-end
     }

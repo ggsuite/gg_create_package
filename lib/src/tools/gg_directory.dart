@@ -10,7 +10,7 @@ import 'package:path/path.dart';
 
 /// Get the project directory
 String ggDirectory() {
-  const packageName = 'gg_cli_cp';
+  const packageName = 'gg_create_package';
 
   // Get the current working directory
   final current = Directory.current.path;
@@ -28,7 +28,7 @@ String ggDirectory() {
     throw Exception(
       'The current directory needs to be either a '
       'subdirectory or the direct parent directory of '
-      'gg_cli_cp.',
+      'gg_create_package.',
     );
   }
 

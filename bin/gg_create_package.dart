@@ -6,7 +6,7 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:args/command_runner.dart';
-import 'package:gg_cli_cp/create_dart_package.dart';
+import 'package:gg_create_package/create_dart_package.dart';
 import 'package:colorize/colorize.dart';
 
 // .............................................................................

@@ -6,7 +6,7 @@
 
 import 'dart:io';
 
-import 'package:gg_cli_cp/src/tools/gg_directory.dart';
+import 'package:gg_create_package/src/tools/gg_directory.dart';
 
 /// Returns the directory the checkouts need to be done
 String checkoutDirectory() {
