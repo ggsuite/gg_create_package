@@ -298,14 +298,13 @@ void main() {
       final pubspec =
           File(join(tempPackageDir.path, 'pubspec.yaml')).readAsStringSync();
       final pattern = RegExp(
-        r'^repository: https://github.com/inlavigo/aud_test$',
+        r'^repository: https://github.com/inlavigo/aud_test.git$',
         multiLine: true,
       );
       expect(pubspec.contains(pattern), isTrue);
 
-      // Should add gg command line to repo
-      expect(pubspec, contains(RegExp(r'gg:')));
-      expect(pubspec, contains('git: https://github.com/inlavigo/gg.git'));
+      // Should add gg_check command line to repo
+      expect(pubspec, contains(RegExp(r'gg_check:')));
 
       // ..............................
       // Should prepare launch.json

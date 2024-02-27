@@ -16,7 +16,6 @@ import 'package:gg_create_package/src/tools/is_github_action.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart';
 import 'package:recase/recase.dart';
-import 'package:yaml_edit/yaml_edit.dart';
 
 import '../snippets/bin_snippet.dart';
 import '../snippets/example_snippet.dart';
@@ -187,7 +186,6 @@ class _CreateDartPackage {
     _prepareTest();
     _prepareExample();
     _prepareInstallScript();
-    _installGgCli();
     _removeUnusedFiles();
     _installDevDependencies();
     _installDependencies();
@@ -434,7 +432,7 @@ class _CreateDartPackage {
     _replaceInFile(
       pubspecFile,
       {
-        r'^#\srepository:.*': 'repository: $gitHubRepo/$packageName',
+        r'^#\srepository:.*': 'repository: $gitHubRepo/$packageName.git',
         r'^description:.*': 'description: $description',
         r'^# Add regular dependencies here.\n': '',
         r'  # path:': '  path:',
@@ -592,6 +590,7 @@ class _CreateDartPackage {
     log('Install dev dependencies...');
     const packages = [
       'pana',
+      'gg_check',
     ];
 
     const options = ['pub', 'add', '--dev', ...packages];
@@ -609,24 +608,6 @@ class _CreateDartPackage {
       );
       // coverage:ignore-end
     }
-  }
-
-  // ...........................................................................
-  void _installGgCli() {
-    log('Install gg cli ...');
-
-    final file = File(join(packageDir, 'pubspec.yaml'));
-    final yamlString = file.readAsStringSync();
-    final doc = YamlEditor(yamlString);
-
-    // Adding the gg dependency under dev_dependencies
-    doc.update(
-      ['dev_dependencies', 'gg'],
-      {'git': 'https://github.com/inlavigo/gg.git'},
-    );
-
-    // Writing the updated YAML back to the file
-    file.writeAsStringSync(doc.toString());
   }
 
   // ...........................................................................
