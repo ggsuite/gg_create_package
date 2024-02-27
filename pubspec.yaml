@@ -16,6 +16,7 @@ dependencies:
   recase: ^4.1.0
   dart_style: ^2.3.4
   yaml_edit: ^2.1.1
+  gg_args: ^1.0.3
 
 dev_dependencies:
   gg_check: ^1.0.1

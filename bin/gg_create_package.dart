@@ -5,52 +5,20 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-import 'package:args/command_runner.dart';
+import 'package:gg_args/gg_args.dart';
 import 'package:gg_create_package/create_dart_package.dart';
-import 'package:colorize/colorize.dart';
+import 'package:gg_create_package/src/commands/create_package.dart';
 
 // .............................................................................
-Future<void> runCreatePackage({
+Future<void> run({
   required List<String> args,
   required void Function(String msg) log,
-}) async {
-  try {
-    final cp = CreatePackage(log: log);
-
-    // Create a command runner
-    final CommandRunner<void> runner = CommandRunner<void>(
-      'GgCreatePackage',
-      cp.description,
-    );
-
-    // If no subcommands are defined, execute the main command
-    if (cp.subcommands.isEmpty && !args.contains(cp.name)) {
-      args = [cp.name, ...args];
-      runner.addCommand(cp);
-    }
-
-    // Otherwise, add the subcommands
-    else {
-      for (final subCommand in cp.subcommands.values) {
-        runner.addCommand(subCommand);
-      }
-    }
-
-    // Run the command
-    await runner.run(args);
-  }
-
-  // Print errors in red
-  catch (e) {
-    final msg = e.toString().replaceAll('Exception: ', '');
-    log(Colorize(msg).red().toString());
-    log('Error: $e');
-  }
-}
+}) =>
+    GgCommandRunner(log: log, command: CreatePackage(log: log)).run(args: args);
 
 // .............................................................................
 Future<void> main(List<String> args) async {
-  await runCreatePackage(
+  await run(
     args: args,
     log: (msg) => print(msg),
   );
