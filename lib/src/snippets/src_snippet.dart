@@ -33,7 +33,7 @@ class $packageNamePascalCase {
 
   /// The function to be executed
   Future<void> exec() async {
-    log('Executing $packageNamePascalCase with param \$param');
+    log('Executing $packageNameCamelCase with param \$param');
   }
 }
 
@@ -76,7 +76,7 @@ class ${packageNamePascalCase}Cmd extends Command<dynamic> {
       abbr: 'p',
       help: 'The param to work with',
       valueHelp: 'param',
-      defaultsTo: '.',
+      mandatory: true,
     );
   }
 }

@@ -8,26 +8,13 @@ import 'package:recase/recase.dart';
 
 /// The snippet for the example file
 String exampleSnippet({required String packageName}) {
-  final packageNamePascalCase = packageName.pascalCase;
   final packageNameCamelCase = packageName.camelCase;
-  final packageNameSnakeCase = packageName.snakeCase;
 
   return '''
-import 'package:$packageNameSnakeCase/$packageNameSnakeCase.dart';
-
 Future<void> main() async {
-  const param = 'foo';
-
-  final $packageNameCamelCase = $packageNamePascalCase(
-    param: param,
-    log: (msg) {},
-  );
-
-  print('Executing with param \$param');
-  await $packageNameCamelCase.exec();
-
-  print('Done.');
+  print('Look into tests, to see $packageNameCamelCase in action.');
 }
+
 '''
       .trim();
 }

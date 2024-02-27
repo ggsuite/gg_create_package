@@ -19,11 +19,22 @@ Future<void> runCreatePackage({
 
     // Create a command runner
     final CommandRunner<void> runner = CommandRunner<void>(
-      'GgCliCp',
+      'GgCreatePackage',
       cp.description,
     );
 
-    runner.addCommand(cp);
+    // If no subcommands are defined, execute the main command
+    if (cp.subcommands.isEmpty && !args.contains(cp.name)) {
+      args = [cp.name, ...args];
+      runner.addCommand(cp);
+    }
+
+    // Otherwise, add the subcommands
+    else {
+      for (final subCommand in cp.subcommands.values) {
+        runner.addCommand(subCommand);
+      }
+    }
 
     // Run the command
     await runner.run(args);

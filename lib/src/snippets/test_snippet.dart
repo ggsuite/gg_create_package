@@ -33,7 +33,7 @@ void main() {
     });
 
     // #########################################################################
-    group('Command', () {
+    group('$packageNameCamelCase', () {
       test('should allow to run the code from command line',
           () async {
         final $packageNameCamelCase =

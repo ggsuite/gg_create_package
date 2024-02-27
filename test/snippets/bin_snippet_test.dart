@@ -17,7 +17,7 @@ void main() {
 
       void exp(String txt) => expect(snippet, contains(txt));
       exp('import \'package:my_package/my_package.dart\';');
-      exp('Future<void> runMyPackage({');
+      exp('Future<void> run({');
     });
   });
 }

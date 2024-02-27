@@ -276,14 +276,14 @@ void main() {
 
       // .................................
       // Package should contain the checks
-      final checkFiles = [
-        'check',
-        'check.yaml',
-      ];
+      final checkFile = File(join(tempPackageDir.path, 'check'));
+      final checkFileContent = checkFile.readAsStringSync();
+      expect(checkFileContent, startsWith('#!/usr/bin/env bash'));
+      expect(checkFileContent, contains('dart run gg_check all'));
 
-      for (final checkFile in checkFiles) {
-        expect(File(join(tempPackageDir.path, checkFile)).existsSync(), true);
-      }
+      final checkYamlFile = File(join(tempPackageDir.path, 'check.yaml'));
+      final checkYamlFileContent = checkYamlFile.readAsStringSync();
+      expect(checkYamlFileContent, contains('needsInternet: false'));
 
       // ...............................
       // Github actions should be copied
@@ -349,8 +349,8 @@ void main() {
         binFileContent,
         contains('import \'package:aud_test/aud_test.dart\';'),
       );
-      expect(binFileContent, contains('Future<void> runAudTest({'));
-      expect(binFileContent, contains('addCommand(AudTestCmd(log: log)'));
+      expect(binFileContent, contains('Future<void> run({'));
+      expect(binFileContent, contains('command: AudTestCmd(log: log),'));
 
       // ..............................
       // Should create a install script
@@ -366,6 +366,12 @@ void main() {
       final audTestBaseFile =
           File(join(tempPackageDir.path, 'lib', 'src', 'aud_test_base.dart'));
       expect(audTestBaseFile.existsSync(), isFalse);
+
+      // .........................................
+      // Should create test/bin/aud_test_test.dart
+      final testFile =
+          File(join(tempPackageDir.path, 'test', 'bin', 'aud_test_test.dart'));
+      expect(testFile.existsSync(), isTrue);
 
       // ...............
       // Should init git

@@ -6,11 +6,11 @@
 
   "configurations": [
     {
-      "name": "Run aud",
+      "name": "Run current file",
       "type": "dart",
       "request": "launch",
-      "program": "${workspaceFolder}/check.dart",
-      "args": ["--verbose"],
+      "program": "${workspaceFolder}/bin/gg_create_package.dart",
+      "args": ["--help"],
       "cwd": "${workspaceFolder}"
     },
     {

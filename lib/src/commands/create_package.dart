@@ -7,6 +7,9 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:gg_create_package/src/snippets/bin_test_snippet.dart';
+import 'package:gg_create_package/src/snippets/check_snippet.dart';
+import 'package:gg_create_package/src/snippets/check_yaml_snippet.dart';
 import 'package:gg_create_package/src/snippets/install_snippet.dart';
 import 'package:gg_create_package/src/snippets/make_executable_snippet.dart';
 import 'package:gg_create_package/src/tools/gg_directory.dart';
@@ -174,7 +177,7 @@ class _CreateDartPackage {
     _copyGitIgnore();
     _copyAnalysisOptions();
     _copyLicense();
-    _copyChecks();
+    _initCheck();
     _copyGitHubActions();
     _preparePubspec();
     _prepareReadme();
@@ -183,6 +186,7 @@ class _CreateDartPackage {
     _preapreSrc();
     _prepareLib();
     _prepareBin();
+    _prepareBinTest();
     _prepareTest();
     _prepareExample();
     _prepareInstallScript();
@@ -357,27 +361,20 @@ class _CreateDartPackage {
   }
 
   // ...........................................................................
-  void _copyChecks() {
+  void _initCheck() {
     log('Copy checks...');
-    // Get all files in the aud_cli directory starting with check
-    final audCliDir = ggDirectory();
-    final files = Directory(join(audCliDir))
-        .listSync()
-        .whereType<File>()
-        .map((e) => relative(e.path, from: audCliDir));
 
-    // Copy over file
-    final checkFiles = files
-        .where(
-          (item) => item.startsWith('check'),
-        )
-        .toList();
+    // Write check.yaml file
+    final checkYaml = checkYamlSnippet;
+    File(join(packageDir, 'check.yaml')).writeAsStringSync(checkYaml);
 
-    for (final file in checkFiles) {
-      final sourceFile = File(join(audCliDir, file));
-      final targetFile = join(packageDir, basename(file));
-      sourceFile.copySync(targetFile);
-    }
+    // Write ./check
+    final checkFile = join(packageDir, 'check');
+    final checkContent = checkSnippet;
+    File(checkFile).writeAsStringSync(checkContent);
+
+    // Make ./check executable
+    _makeFileExecutable(checkFile);
   }
 
   // ...........................................................................
@@ -432,6 +429,7 @@ class _CreateDartPackage {
     _replaceInFile(
       pubspecFile,
       {
+        r'sdk:.*': 'sdk: ">=3.3.0 <4.0.0"',
         r'^#\srepository:.*': 'repository: $gitHubRepo/$packageName.git',
         r'^description:.*': 'description: $description',
         r'^# Add regular dependencies here.\n': '',
@@ -497,6 +495,22 @@ class _CreateDartPackage {
 
     File(binFile).writeAsStringSync(binFileContent);
     _makeFileExecutable(binFile);
+  }
+
+  // ...........................................................................
+  void _prepareBinTest() {
+    log('Prepare bin ...');
+    final binTestFolder = join(packageDir, 'test', 'bin');
+    Directory(binTestFolder).createSync();
+    final binTestFile = join(binTestFolder, '${packageName}_test.dart');
+    var fileContent = binTestSnippet(
+      packageName: packageName,
+    );
+
+    fileContent = '$fileHeaderSnippet\n\n' '$fileContent\n';
+    fileContent = formatter.format(fileContent);
+
+    File(binTestFile).writeAsStringSync(fileContent);
   }
 
   // ...........................................................................
@@ -568,7 +582,12 @@ class _CreateDartPackage {
   // ...........................................................................
   void _installDependencies() {
     log('Install dependencies...');
-    const packages = ['args', 'colorize'];
+    const packages = [
+      'args',
+      'colorize',
+      'gg_process',
+      'gg_args',
+    ];
     const options = ['pub', 'add', ...packages];
     final result = Process.runSync(
       'dart',
@@ -591,6 +610,7 @@ class _CreateDartPackage {
     const packages = [
       'pana',
       'gg_check',
+      'gg_capture_print',
     ];
 
     const options = ['pub', 'add', '--dev', ...packages];

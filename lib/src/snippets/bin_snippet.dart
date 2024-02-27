@@ -27,38 +27,23 @@ String binSnippet({
       descriptionMultiLine.map((String e) => '\'${e.trim()}. \'').join('\n');
 
   return '''
-
-import 'package:args/command_runner.dart';
-import 'package:colorize/colorize.dart';
+import 'package:gg_args/gg_args.dart';
 import 'package:$packageNameSnakeCase/$packageNameSnakeCase.dart';
 
 // .............................................................................
-Future<void> run$packageNamePascalCase({
+Future<void> run({
   required List<String> args,
   required void Function(String msg) log,
-}) async {
-  try {
-    // Create a command runner
-    final CommandRunner<void> runner = CommandRunner<void>(
-      '$packageNamePascalCase',
-       $description,
-    )..addCommand(${packageNamePascalCase}Cmd(log: log));
+}) =>
+    GgCommandRunner(
+      log: log,
+      command: ${packageNamePascalCase}Cmd(log: log),
+    ).run(args: args);
 
-    // Run the command
-    await runner.run(args);
-  }
-
-  // Print errors in red
-  catch (e) {
-    final msg = e.toString().replaceAll('Exception: ', '');
-    log(Colorize(msg).red().toString());
-    log('Error: \$e');
-  }
-}
 
 // .............................................................................
 Future<void> main(List<String> args) async {
-  await run$packageNamePascalCase(
+  await run(
     args: args,
     log: (msg) => print(msg),
   );
