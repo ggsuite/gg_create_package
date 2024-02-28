@@ -11,6 +11,7 @@ import 'package:gg_create_package/src/snippets/bin_test_snippet.dart';
 import 'package:gg_create_package/src/snippets/check_snippet.dart';
 import 'package:gg_create_package/src/snippets/check_yaml_snippet.dart';
 import 'package:gg_create_package/src/snippets/install_snippet.dart';
+import 'package:gg_create_package/src/snippets/launch_json_test_snippet.dart';
 import 'package:gg_create_package/src/snippets/make_executable_snippet.dart';
 import 'package:gg_create_package/src/tools/gg_directory.dart';
 import 'package:gg_create_package/src/tools/checkout_directory.dart';
@@ -182,6 +183,7 @@ class _CreateDartPackage {
     _preparePubspec();
     _prepareReadme();
     _prepareLaunchJson();
+    _prepareLaunchJsonTest();
     _prepareChangeLog();
     _preapreSrc();
     _prepareLib();
@@ -454,6 +456,19 @@ class _CreateDartPackage {
     final launchJsonFile = join(packageDir, '.vscode', 'launch.json');
     final content = launchJsonSnippet(packageName: packageName);
     File(launchJsonFile).writeAsStringSync(content);
+  }
+
+  // ...........................................................................
+  void _prepareLaunchJsonTest() {
+    log('Prepare launch.json test...');
+    final launchJsonTestDirectory = join(packageDir, 'test', 'vscode');
+    Directory(launchJsonTestDirectory).createSync(recursive: true);
+
+    final launchJsonTestFile =
+        join(packageDir, 'test', 'vscode', 'launch_json_test.dart');
+    final snippet = launchJsonTestSnippet(packageName: packageName);
+    final content = formatter.format('$fileHeaderSnippet\n\n$snippet\n');
+    File(launchJsonTestFile).writeAsStringSync(content);
   }
 
   // ...........................................................................

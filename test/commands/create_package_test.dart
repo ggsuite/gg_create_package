@@ -255,6 +255,25 @@ void main() {
         true,
       );
 
+      // .....................................................
+      // The package should contain a test testing .launch.json file
+      final launchJsonTestFile = File(
+        join(
+          tempPackageDir.path,
+          'test',
+          'vscode',
+          'launch_json_test.dart',
+        ),
+      );
+
+      expect(
+        launchJsonTestFile.existsSync(),
+        true,
+      );
+
+      final launchJsonTestFileContent = launchJsonTestFile.readAsStringSync();
+      expect(launchJsonTestFileContent, contains('bin/aud_test.dart'));
+
       // .......................................................
       // The package should contain a analysis_options.yaml file
       expect(

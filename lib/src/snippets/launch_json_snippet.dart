@@ -8,8 +8,6 @@ import 'package:recase/recase.dart';
 
 /// Creates a launchJson snippet
 String launchJsonSnippet({required String packageName}) {
-  final packageNamePascalCase = packageName.pascalCase;
-  final packageNameCamelCase = packageName.camelCase;
   final packageNameSnakeCase = packageName.snakeCase;
 
   return '''
@@ -21,15 +19,15 @@ String launchJsonSnippet({required String packageName}) {
 
   "configurations": [
     {
-      "name": "Run $packageNamePascalCase",
+      "name": "$packageNameSnakeCase.dart",
       "type": "dart",
       "request": "launch",
       "program": "\${workspaceFolder}/bin/$packageNameSnakeCase.dart",
-      "args": ["$packageNameCamelCase", "--param", "value"],
+      "args": ["--param", "value"],
       "console": "debugConsole"
     },
     {
-      "name": "Test Current File",
+      "name": "Current File",
       "type": "dart",
       "request": "launch",
       "program": "\${file}"
