@@ -67,7 +67,7 @@ void main() {
         final expectedMessages = ['Executing $packageNameCamelCase with param 5'];
 
         for (final msg in expectedMessages) {
-          expect(hasLog(msg, messages), isTrue);
+          expect(hasLog(messages, msg), isTrue);
         }
       });
     });

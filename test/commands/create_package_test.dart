@@ -331,7 +331,7 @@ void main() {
           File(join(tempPackageDir.path, '.vscode', 'launch.json'))
               .readAsStringSync();
 
-      expect(launchJson, contains(r'"name": "Run AudTest"'));
+      expect(launchJson, contains(r'"name": "aud_test.dart"'));
       expect(
         launchJson,
         contains(r'"program": "${workspaceFolder}/bin/aud_test.dart"'),
