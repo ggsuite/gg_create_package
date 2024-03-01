@@ -13,6 +13,8 @@ import 'package:gg_create_package/src/snippets/check_yaml_snippet.dart';
 import 'package:gg_create_package/src/snippets/install_snippet.dart';
 import 'package:gg_create_package/src/snippets/launch_json_test_snippet.dart';
 import 'package:gg_create_package/src/snippets/make_executable_snippet.dart';
+import 'package:gg_create_package/src/snippets/src_my_command_snippet.dart';
+import 'package:gg_create_package/src/snippets/test_my_command_test_snippet.dart';
 import 'package:gg_create_package/src/tools/gg_directory.dart';
 import 'package:gg_create_package/src/tools/checkout_directory.dart';
 import 'package:gg_create_package/src/tools/color.dart';
@@ -185,11 +187,13 @@ class _CreateDartPackage {
     _prepareLaunchJson();
     _prepareLaunchJsonTest();
     _prepareChangeLog();
-    _preapreSrc();
+    _prepareCommand();
+    _prepareSubCommand();
     _prepareLib();
     _prepareBin();
     _prepareBinTest();
-    _prepareTest();
+    _prepareCommandTest();
+    _prepareSubCommandTest();
     _prepareExample();
     _prepareInstallScript();
     _removeUnusedFiles();
@@ -483,11 +487,25 @@ class _CreateDartPackage {
   }
 
   // ...........................................................................
-  void _preapreSrc() {
+  void _prepareCommand() {
     log('Prepare src ...');
     final implementationFile =
         join(packageDir, 'lib', 'src', '$packageName.dart');
     final implementationSnippet = srcSnippet(packageName: packageName);
+    final content =
+        formatter.format('$fileHeaderSnippet\n\n$implementationSnippet\n');
+    File(implementationFile).writeAsStringSync(content);
+  }
+
+  // ...........................................................................
+  void _prepareSubCommand() {
+    log('Prepare src/commands ...');
+
+    final commandDir = join(packageDir, 'lib', 'src', 'commands');
+    Directory(commandDir).createSync(recursive: true);
+
+    final implementationFile = join(commandDir, 'my_command.dart');
+    final implementationSnippet = srcCommandsMyCommandSnippet;
     final content =
         formatter.format('$fileHeaderSnippet\n\n$implementationSnippet\n');
     File(implementationFile).writeAsStringSync(content);
@@ -529,12 +547,24 @@ class _CreateDartPackage {
   }
 
   // ...........................................................................
-  void _prepareTest() {
+  void _prepareCommandTest() {
     log('Prepare test folder...');
     final testFolder = join(packageDir, 'test');
     Directory(testFolder).createSync();
     final testFile = join(testFolder, '${packageName}_test.dart');
     final testFileContent = testSnippet(packageName: packageName);
+    final content =
+        formatter.format('$fileHeaderSnippet\n\n$testFileContent\n');
+    File(testFile).writeAsStringSync(content);
+  }
+
+  // ...........................................................................
+  void _prepareSubCommandTest() {
+    log('Prepare test folder...');
+    final testFolder = join(packageDir, 'test', 'commands');
+    Directory(testFolder).createSync(recursive: true);
+    final testFile = join(testFolder, 'my_command_test.dart');
+    final testFileContent = testMyCommandTestSnippet(packageName: packageName);
     final content =
         formatter.format('$fileHeaderSnippet\n\n$testFileContent\n');
     File(testFile).writeAsStringSync(content);

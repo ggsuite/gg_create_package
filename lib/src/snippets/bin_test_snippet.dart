@@ -37,14 +37,14 @@ void main() {
       // Execute bin/$packageSnakeCase.dart and check if it prints help
       final result = await Process.run(
         './bin/$packageSnakeCase.dart',
-        [],
+        ['my-command'],
         stdoutEncoding: utf8,
         stderrEncoding: utf8,
       );
 
       final expectedMessages = [
         'Invalid argument(s): Option',
-        Colorize('param').red().toString(),
+        Colorize('input').red().toString(),
         'is mandatory.',
       ];
 
@@ -62,9 +62,9 @@ void main() {
       test('should print "value"', () async {
         // Execute bin/$packageSnakeCase.dart and check if it prints "value"
         final messages = <String>[];
-        await run(args: ['--param', '5'], log: messages.add);
+        await run(args: ['my-command', '--input', '5'], log: messages.add);
 
-        final expectedMessages = ['Executing $packageNameCamelCase with param 5'];
+        final expectedMessages = ['Running my-command with param 5'];
 
         for (final msg in expectedMessages) {
           expect(hasLog(messages, msg), isTrue);

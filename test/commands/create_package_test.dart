@@ -53,7 +53,7 @@ void main() {
     // #########################################################################
     test('should throw when target directory does not exist', () async {
       // Expect throws exception
-      expectLater(
+      await expectLater(
         r.run([
           'cp',
           '-o',

@@ -16,6 +16,7 @@ String srcSnippet({required String packageName}) {
 
 // #############################################################################
 import 'package:args/command_runner.dart';
+import './commands/my_command.dart';
 
 /// $packageNameTitleCase
 class $packageNamePascalCase {
@@ -42,7 +43,7 @@ class $packageNamePascalCase {
 class ${packageNamePascalCase}Cmd extends Command<dynamic> {
   /// Constructor
   ${packageNamePascalCase}Cmd({required this.log}) {
-    _addArgs();
+    addSubcommand(MyCommand(log: log));
   }
 
   /// The log function
@@ -53,32 +54,6 @@ class ${packageNamePascalCase}Cmd extends Command<dynamic> {
   final name = '$packageNameCamelCase';
   @override
   final description = 'Add your description here.';
-
-  // ...........................................................................
-  @override
-  Future<void> run() async {
-    var param = argResults?['param'] as String;
-    $packageNamePascalCase(
-      param: param,
-      log: log,
-    );
-
-    await $packageNamePascalCase(
-      param: param,
-      log: log,
-    ).exec();
-  }
-
-  // ...........................................................................
-  void _addArgs() {
-    argParser.addOption(
-      'param',
-      abbr: 'p',
-      help: 'The param to work with',
-      valueHelp: 'param',
-      mandatory: true,
-    );
-  }
 }
 ''';
 }
