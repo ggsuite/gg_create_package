@@ -30,18 +30,10 @@ void main() {
   });
 
   group('$packageNamePascalCase()', () {
-    // #########################################################################
-    group('exec()', () {
-      test('description of the test ', () async {
-        final $packageNameCamelCase = $packageNamePascalCase(param: 'foo', log: (msg) => messages.add(msg));
-
-        await $packageNameCamelCase.exec();
-      });
-    });
 
     // #########################################################################
     group('$packageNamePascalCase', () {
-      final $packageNameCamelCase = ${packageNamePascalCase}Cmd(log: (msg) => messages.add(msg));
+      final $packageNameCamelCase = $packageNamePascalCase(log: (msg) => messages.add(msg));
 
       final CommandRunner<void> runner = CommandRunner<void>(
         '$packageNameCamelCase',

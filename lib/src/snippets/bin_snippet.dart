@@ -37,7 +37,7 @@ Future<void> run({
 }) =>
     GgCommandRunner(
       log: log,
-      command: ${packageNamePascalCase}Cmd(log: log),
+      command: $packageNamePascalCase(log: log),
     ).run(args: args);
 
 

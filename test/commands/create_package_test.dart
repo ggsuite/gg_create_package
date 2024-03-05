@@ -369,7 +369,7 @@ void main() {
         contains('import \'package:aud_test/aud_test.dart\';'),
       );
       expect(binFileContent, contains('Future<void> run({'));
-      expect(binFileContent, contains('command: AudTestCmd(log: log),'));
+      expect(binFileContent, contains('command: AudTest(log: log),'));
 
       // ..............................
       // Should create a install script

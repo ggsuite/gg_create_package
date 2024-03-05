@@ -8,41 +8,17 @@ import 'package:recase/recase.dart';
 
 /// The snippet for the source file
 String srcSnippet({required String packageName}) {
-  final packageNameTitleCase = packageName.titleCase;
   final packageNamePascalCase = packageName.pascalCase;
   final packageNameCamelCase = packageName.camelCase;
 
   return '''
-
-// #############################################################################
 import 'package:args/command_runner.dart';
 import './commands/my_command.dart';
 
-/// $packageNameTitleCase
-class $packageNamePascalCase {
-  /// Constructor
-  $packageNamePascalCase({
-    required this.param,
-    required this.log,
-  });
-
-  /// The param to work with
-  final String param;
-
-  /// The log function
-  final void Function(String msg) log;
-
-  /// The function to be executed
-  Future<void> exec() async {
-    log('Executing $packageNameCamelCase with param \$param');
-  }
-}
-
-// #############################################################################
 /// The command line interface for $packageNamePascalCase
-class ${packageNamePascalCase}Cmd extends Command<dynamic> {
+class $packageNamePascalCase extends Command<dynamic> {
   /// Constructor
-  ${packageNamePascalCase}Cmd({required this.log}) {
+  $packageNamePascalCase({required this.log}) {
     addSubcommand(MyCommand(log: log));
   }
 
