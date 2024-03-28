@@ -16,7 +16,6 @@ import 'package:recase/recase.dart';
 String binTestSnippet({
   required String packageName,
 }) {
-  final packageNameCamelCase = packageName.camelCase;
   final packageSnakeCase = packageName.snakeCase;
 
   return '''
@@ -62,7 +61,7 @@ void main() {
       test('should print "value"', () async {
         // Execute bin/$packageSnakeCase.dart and check if it prints "value"
         final messages = <String>[];
-        await run(args: ['my-command', '--input', '5'], log: messages.add);
+        await run(args: ['my-command', '--input', '5'], ggLog: messages.add);
 
         final expectedMessages = ['Running my-command with param 5'];
 

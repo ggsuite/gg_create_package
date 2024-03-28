@@ -7,6 +7,7 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_create_package/src/commands/create_package.dart';
 import 'package:gg_create_package/src/snippets/file_header_snippet.dart';
 import 'package:gg_create_package/src/snippets/open_source_licence_snippet.dart';
@@ -22,10 +23,6 @@ void main() {
   final logMessages = <String>[];
   const String description = 'This is a description of the package. '
       'It should be at least 60 characters long.';
-
-  void log(String message) {
-    logMessages.add(message);
-  }
 
   // ...........................................................................
   setUp(() {
@@ -45,7 +42,7 @@ void main() {
   final r = CommandRunner<dynamic>(
     'aud',
     'Our cli to manage many tasks about audanika software development.',
-  )..addCommand(CreatePackage(log: log));
+  )..addCommand(CreatePackage(ggLog: logMessages.add));
 
   // ...........................................................................
 
@@ -192,17 +189,28 @@ void main() {
       tempPackageDir.createSync();
 
       // Expect does not throw exception because --force is given
-      await r.run([
-        'cp',
-        '-o',
-        tempDir.path,
-        '-n',
-        'aud_test',
-        '-d',
-        description,
-        '--prepare-github',
-        '--force',
-      ]);
+      try {
+        await r.run([
+          'cp',
+          '-o',
+          tempDir.path,
+          '-n',
+          'aud_test',
+          '-d',
+          description,
+          '--prepare-github',
+          '--force',
+        ]);
+      } catch (e) {
+        print(
+          blue(
+            'Please open "${yellow(tempPackageDir.path)}" '
+            'in visual studio code '
+            'to analyze the errors in detail.',
+          ),
+        );
+        rethrow;
+      }
 
       // The package should exist
       expect(tempPackageDir.existsSync(), true);
@@ -323,7 +331,7 @@ void main() {
       expect(pubspec.contains(pattern), isTrue);
 
       // Should add gg_check command line to repo
-      expect(pubspec, contains(RegExp(r'gg_check:')));
+      expect(pubspec, contains(RegExp(r'gg:')));
 
       // ..............................
       // Should prepare launch.json
@@ -369,7 +377,7 @@ void main() {
         contains('import \'package:aud_test/aud_test.dart\';'),
       );
       expect(binFileContent, contains('Future<void> run({'));
-      expect(binFileContent, contains('command: AudTest(log: log),'));
+      expect(binFileContent, contains('command: AudTest(ggLog: ggLog),'));
 
       // ..............................
       // Should create a install script

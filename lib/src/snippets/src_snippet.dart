@@ -14,16 +14,17 @@ String srcSnippet({required String packageName}) {
   return '''
 import 'package:args/command_runner.dart';
 import './commands/my_command.dart';
+import 'package:gg_log/gg_log.dart';
 
 /// The command line interface for $packageNamePascalCase
 class $packageNamePascalCase extends Command<dynamic> {
   /// Constructor
-  $packageNamePascalCase({required this.log}) {
-    addSubcommand(MyCommand(log: log));
+  $packageNamePascalCase({required this.ggLog}) {
+    addSubcommand(MyCommand(ggLog: ggLog));
   }
 
   /// The log function
-  final void Function(String message) log;
+  final GgLog ggLog;
 
   // ...........................................................................
   @override

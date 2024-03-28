@@ -8,18 +8,20 @@
 import 'package:gg_args/gg_args.dart';
 import 'package:gg_create_package/create_dart_package.dart';
 import 'package:gg_create_package/src/commands/create_package.dart';
+import 'package:gg_log/gg_log.dart';
 
 // .............................................................................
 Future<void> run({
   required List<String> args,
-  required void Function(String msg) log,
+  required GgLog ggLog,
 }) =>
-    GgCommandRunner(log: log, command: CreatePackage(log: log)).run(args: args);
+    GgCommandRunner(ggLog: ggLog, command: CreatePackage(ggLog: ggLog))
+        .run(args: args);
 
 // .............................................................................
 Future<void> main(List<String> args) async {
   await run(
     args: args,
-    log: (msg) => print(msg),
+    ggLog: print,
   );
 }

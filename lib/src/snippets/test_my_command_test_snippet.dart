@@ -24,7 +24,7 @@ void main() {
   setUp(() {
     messages.clear();
     runner = CommandRunner<void>('test', 'test');
-    final myCommand = MyCommand(log: messages.add);
+    final myCommand = MyCommand(ggLog: messages.add);
     runner.addCommand(myCommand);
   });
 
@@ -34,7 +34,7 @@ void main() {
       group('should print a usage description', () {
         test('when called args=[--help]', () async {
           capturePrint(
-            log: messages.add,
+            ggLog: messages.add,
             code: () => runner.run(
               ['--help'],
             ),

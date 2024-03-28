@@ -21,6 +21,7 @@ import 'package:$packageNameSnakeCase/$packageNameSnakeCase.dart';
 import 'package:path/path.dart';
 import 'package:recase/recase.dart';
 import 'package:test/test.dart';
+import 'package:gg_args/gg_args.dart';
 
 void main() {
   final messages = <String>[];
@@ -33,7 +34,7 @@ void main() {
 
     // #########################################################################
     group('$packageNamePascalCase', () {
-      final $packageNameCamelCase = $packageNamePascalCase(log: (msg) => messages.add(msg));
+      final $packageNameCamelCase = $packageNamePascalCase(ggLog: messages.add);
 
       final CommandRunner<void> runner = CommandRunner<void>(
         '$packageNameCamelCase',
@@ -42,7 +43,7 @@ void main() {
 
       test('should allow to run the code from command line', () async {
         await capturePrint(
-          log: messages.add,
+          ggLog: messages.add,
           code: () async =>
               await runner.run(['$packageNameCamelCase', 'my-command', '--input', 'foo']),
         );
@@ -51,38 +52,12 @@ void main() {
 
       // .......................................................................
       test('should show all sub commands', () async {
-        // Iterate all files in lib/src/commands
-        // and check if they are added to the command runner
-        // and if they are added to the help message
-        final subCommands = Directory('lib/src/commands')
-            .listSync(recursive: false)
-            .where(
-              (file) => file.path.endsWith('.dart'),
-            )
-            .map(
-              (e) => basename(e.path)
-                  .replaceAll('.dart', '')
-                  .replaceAll('_', '-')
-                  .replaceAll('gg-', ''),
-            )
-            .toList();
-
-        await capturePrint(
-          log: messages.add,
-          code: () async => await runner.run(['$packageNameCamelCase', '--help']),
+        final (subCommands, errorMessage) = await missingSubCommands(
+          directory: Directory('lib/src/commands'),
+          command: $packageNameCamelCase,
         );
 
-        for (final subCommand in subCommands) {
-          final subCommandStr = '\${subCommand.pascalCase}';
-
-          expect(
-            hasLog(messages, subCommand),
-            isTrue,
-            reason: '\\nMissing subcommand "\$subCommandStr"\\n'
-                'Please open  "lib/src/$packageNameSnakeCase.dart" and add\\n'
-                '"addSubcommand(\$subCommandStr(log: log));',
-          );
-        }
+        expect(subCommands, isEmpty, reason: errorMessage);
       });
     });
   });

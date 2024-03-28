@@ -8,19 +8,20 @@
 String get srcCommandsMyCommandSnippet => r'''
 
 import 'package:args/command_runner.dart';
+import 'package:gg_log/gg_log.dart';
 
 // #############################################################################
-/// Base class for all ggGit commands
+/// An example command
 class MyCommand extends Command<dynamic> {
   /// Constructor
   MyCommand({
-    required this.log,
+    required this.ggLog,
   }) {
     _addArgs();
   }
 
   /// The log function
-  final void Function(String message) log;
+  final GgLog ggLog;
 
   /// Then name of the command
   @override
@@ -34,7 +35,7 @@ class MyCommand extends Command<dynamic> {
   @override
   Future<void> run() async {
     input = argResults!['input'] as String;
-    log('Running $name with param $input');
+    ggLog('Running $name with param $input');
   }
 
   // ...........................................................................

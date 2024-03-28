@@ -20,6 +20,7 @@ import 'package:gg_create_package/src/tools/checkout_directory.dart';
 import 'package:gg_create_package/src/tools/color.dart';
 import 'package:gg_create_package/src/tools/is_github_action.dart';
 import 'package:dart_style/dart_style.dart';
+import 'package:gg_log/gg_log.dart';
 import 'package:path/path.dart';
 import 'package:recase/recase.dart';
 
@@ -45,7 +46,7 @@ class CreatePackage extends Command<dynamic> {
 
   /// Constructor
   CreatePackage({
-    this.log,
+    required this.ggLog,
   }) {
     // Add the output option
     argParser.addOption(
@@ -99,7 +100,7 @@ class CreatePackage extends Command<dynamic> {
   }
   // ...........................................................................
   /// The log function
-  final void Function(String message)? log;
+  final GgLog ggLog;
 
   // ...........................................................................
   /// Runs the command
@@ -130,7 +131,7 @@ class CreatePackage extends Command<dynamic> {
       packageDir: join(updatedOutputDir, packageName),
       packageName: packageName,
       description: description,
-      log: log ?? (msg) {},
+      ggLog: ggLog,
       isOpenSource: isOpenSource,
       prepareGitHub: pushToGitHub,
       force: force,
@@ -149,7 +150,7 @@ class _CreateDartPackage {
     required this.packageDir,
     required this.packageName,
     required this.description,
-    required this.log,
+    required this.ggLog,
     required this.isOpenSource,
     required this.prepareGitHub,
     required this.force,
@@ -159,7 +160,7 @@ class _CreateDartPackage {
   final String packageDir;
   final String packageName;
   final String description;
-  final void Function(String message) log;
+  final GgLog ggLog;
   final bool isOpenSource;
   final bool prepareGitHub;
   final bool force;
@@ -168,7 +169,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   Future<void> run() async {
-    log('\nCreate dart package...\n');
+    ggLog('\nCreate dart package...\n');
 
     _deleteExistingPackage();
     _checkDirectories();
@@ -208,7 +209,7 @@ class _CreateDartPackage {
   void _deleteExistingPackage() {
     if (!force) return;
 
-    log('Delete existing package...');
+    ggLog('Delete existing package...');
     final packageDir = join(outputDir, packageName);
     if (Directory(packageDir).existsSync()) {
       Directory(packageDir).deleteSync(recursive: true);
@@ -217,7 +218,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _checkDirectories() {
-    log('Check directories...');
+    ggLog('Check directories...');
 
     // Target dir exists?
     if (!Directory(outputDir).existsSync()) {
@@ -233,7 +234,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _checkPackageName() {
-    log('Check package names...');
+    ggLog('Check package names...');
     if (isOpenSource && !packageName.startsWith('gg_')) {
       throw Exception('Open source packages should start with "gg_"');
     }
@@ -245,7 +246,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _checkDescription() {
-    log('Check description ...');
+    ggLog('Check description ...');
     if (description.length < 60) {
       throw Exception('The description must be at least 60 characters long.');
     }
@@ -255,7 +256,7 @@ class _CreateDartPackage {
   Future<void> _checkGithubOrigin() async {
     if (!prepareGitHub) return;
 
-    log('Check GitHub origin...');
+    ggLog('Check GitHub origin...');
 
     final repo = 'git@github.com:inlavigo/$packageName.git';
 
@@ -281,7 +282,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   Future<void> _createPackage() async {
-    log('Create package...');
+    ggLog('Create package...');
     // .......................
     // Create the dart package
     final result = await Process.run(
@@ -295,13 +296,13 @@ class _CreateDartPackage {
     if (result.exitCode != 0 &&
         result.stderr != null &&
         (result.stderr as String).isNotEmpty) {
-      log(result.stderr as String);
+      ggLog(result.stderr as String);
     }
 
     if (result.exitCode != 0 &&
         result.stdout != null &&
         (result.stdout as String).isNotEmpty) {
-      log(result.stdout as String);
+      ggLog(result.stdout as String);
     }
     // coverage:ignore-end
   }
@@ -309,7 +310,7 @@ class _CreateDartPackage {
   // ...........................................................................
   void _copyVsCodeSettings() {
     // Copy over VScode which are located in project/.vscode
-    log('Copy VSCode settings...');
+    ggLog('Copy VSCode settings...');
 
     final vscodeDir = join(ggDirectory(), '.vscode');
     final targetVscodeDir = join(packageDir, '.vscode');
@@ -340,7 +341,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _copyGitIgnore() {
-    log('Copy .gitignore...');
+    ggLog('Copy .gitignore...');
     _copyFile(
       join(ggDirectory(), '.gitignore'),
       join(packageDir, '.gitignore'),
@@ -349,7 +350,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _copyAnalysisOptions() {
-    log('Copy analysis_options.yaml...');
+    ggLog('Copy analysis_options.yaml...');
     _copyFile(
       join(ggDirectory(), 'analysis_options.yaml'),
       join(packageDir, 'analysis_options.yaml'),
@@ -358,7 +359,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _copyLicense() {
-    log('Copy LICENSE...');
+    ggLog('Copy LICENSE...');
     final license =
         (isOpenSource ? openSourceLicenseSnippet : privateLicenceSnippet)
             .replaceAll('YEAR', DateTime.now().year.toString());
@@ -368,7 +369,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _initCheck() {
-    log('Copy checks...');
+    ggLog('Copy checks...');
 
     // Write check.yaml file
     final checkYaml = checkYamlSnippet;
@@ -385,7 +386,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _copyGitHubActions() {
-    log('Copy GitHub Actions...');
+    ggLog('Copy GitHub Actions...');
     // Copy over GitHub Actions
     final githubActionsDir = join(ggDirectory(), '.github');
     final targetGitHubActionsDir = join(packageDir, '.github');
@@ -429,7 +430,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _preparePubspec() {
-    log('Prepare pubspec.yaml...');
+    ggLog('Prepare pubspec.yaml...');
     final pubspecFile = join(packageDir, 'pubspec.yaml');
 
     _replaceInFile(
@@ -446,7 +447,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _prepareReadme() {
-    log('Prepare README.md...');
+    ggLog('Prepare README.md...');
     final readmeFile = join(packageDir, 'README.md');
     String content = '';
     content += '# $packageName\n\n';
@@ -456,7 +457,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _prepareLaunchJson() {
-    log('Prepare launch.json...');
+    ggLog('Prepare launch.json...');
     final launchJsonFile = join(packageDir, '.vscode', 'launch.json');
     final content = launchJsonSnippet(packageName: packageName);
     File(launchJsonFile).writeAsStringSync(content);
@@ -464,7 +465,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _prepareLaunchJsonTest() {
-    log('Prepare launch.json test...');
+    ggLog('Prepare launch.json test...');
     final launchJsonTestDirectory = join(packageDir, 'test', 'vscode');
     Directory(launchJsonTestDirectory).createSync(recursive: true);
 
@@ -477,7 +478,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _prepareChangeLog() {
-    log('Prepare CHANGELOG.md...');
+    ggLog('Prepare CHANGELOG.md...');
     final changeLogFile = File(join(packageDir, 'CHANGELOG.md'));
     String content = '';
     content += '# Change Log\n\n';
@@ -488,7 +489,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _prepareCommand() {
-    log('Prepare src ...');
+    ggLog('Prepare src ...');
     final implementationFile =
         join(packageDir, 'lib', 'src', '$packageName.dart');
     final implementationSnippet = srcSnippet(packageName: packageName);
@@ -499,7 +500,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _prepareSubCommand() {
-    log('Prepare src/commands ...');
+    ggLog('Prepare src/commands ...');
 
     final commandDir = join(packageDir, 'lib', 'src', 'commands');
     Directory(commandDir).createSync(recursive: true);
@@ -513,7 +514,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _prepareBin() {
-    log('Prepare bin ...');
+    ggLog('Prepare bin ...');
     final binFolder = join(packageDir, 'bin');
     Directory(binFolder).createSync();
     final binFile = join(binFolder, '$packageName.dart');
@@ -532,7 +533,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _prepareBinTest() {
-    log('Prepare bin ...');
+    ggLog('Prepare bin ...');
     final binTestFolder = join(packageDir, 'test', 'bin');
     Directory(binTestFolder).createSync();
     final binTestFile = join(binTestFolder, '${packageName}_test.dart');
@@ -548,7 +549,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _prepareCommandTest() {
-    log('Prepare test folder...');
+    ggLog('Prepare test folder...');
     final testFolder = join(packageDir, 'test');
     Directory(testFolder).createSync();
     final testFile = join(testFolder, '${packageName}_test.dart');
@@ -560,7 +561,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _prepareSubCommandTest() {
-    log('Prepare test folder...');
+    ggLog('Prepare test folder...');
     final testFolder = join(packageDir, 'test', 'commands');
     Directory(testFolder).createSync(recursive: true);
     final testFile = join(testFolder, 'my_command_test.dart');
@@ -572,7 +573,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _prepareExample() {
-    log('Prepare example folder...');
+    ggLog('Prepare example folder...');
     final exampleFolder = join(packageDir, 'example');
     Directory(exampleFolder).createSync();
     final exampleFile =
@@ -589,7 +590,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _prepareInstallScript() {
-    log('Prepare install script...');
+    ggLog('Prepare install script...');
     final installFile = join(packageDir, 'install.dart');
     final installContent = installSnippet(packageName: packageName);
     final content = formatter.format(
@@ -601,7 +602,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _removeUnusedFiles() {
-    log('Remove unused files...');
+    ggLog('Remove unused files...');
     final packageNameSnakeCase = packageName.snakeCase;
     final files = [
       join(packageDir, 'lib', 'src', '${packageNameSnakeCase}_base.dart'),
@@ -616,7 +617,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _prepareLib() {
-    log('Prepare lib folder...');
+    ggLog('Prepare lib folder...');
     final libFolder = join(packageDir, 'lib');
     final libDartFile = join(libFolder, '$packageName.dart');
     final libDartContent = libSnippet(packageName: packageName);
@@ -626,12 +627,13 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _installDependencies() {
-    log('Install dependencies...');
+    ggLog('Install dependencies...');
     const packages = [
       'args',
       'colorize',
       'gg_process',
       'gg_args',
+      'gg_log',
     ];
     const options = ['pub', 'add', ...packages];
     final result = Process.runSync(
@@ -651,10 +653,10 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _installDevDependencies() {
-    log('Install dev dependencies...');
+    ggLog('Install dev dependencies...');
     const packages = [
       'pana',
-      'gg_check',
+      'gg',
       'gg_capture_print',
     ];
 
@@ -677,13 +679,13 @@ class _CreateDartPackage {
 
   // ...........................................................................
   Future<void> _waitShortly() async {
-    log('Wait a moment...');
+    ggLog('Wait a moment...');
     await Future<void>.delayed(const Duration(milliseconds: 500));
   }
 
   // ...........................................................................
   void _fixErrorsAndWarnings() {
-    log('Fix errors and warnings...');
+    ggLog('Fix errors and warnings...');
     // Execute dart fix
     final result = Process.runSync(
       'dart',
@@ -742,7 +744,7 @@ class _CreateDartPackage {
 
     // coverage:ignore-start
 
-    log('Init git...');
+    ggLog('Init git...');
     // Execute git init
     final result = Process.runSync(
       'git',
@@ -828,13 +830,13 @@ class _CreateDartPackage {
       }
     }
 
-    log('\nSuccess! To open the project with visual studio code, call ');
-    log('${greenStart}code $packageDir$end\n');
+    ggLog('\nSuccess! To open the project with visual studio code, call ');
+    ggLog('${greenStart}code $packageDir$end\n');
 
     if (prepareGitHub) {
-      log('To push the project to GitHub, call');
-      log('${greenStart}git push -u origin main$end\n');
-      log('Happy coding!');
+      ggLog('To push the project to GitHub, call');
+      ggLog('${greenStart}git push -u origin main$end\n');
+      ggLog('Happy coding!');
     }
 
     // coverage:ignore-end
