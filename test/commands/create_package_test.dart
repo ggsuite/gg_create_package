@@ -306,7 +306,7 @@ void main() {
       final checkFile = File(join(tempPackageDir.path, 'check'));
       final checkFileContent = checkFile.readAsStringSync();
       expect(checkFileContent, startsWith('#!/usr/bin/env bash'));
-      expect(checkFileContent, contains('dart run gg_check all'));
+      expect(checkFileContent, contains('dart run gg can commit'));
 
       final checkYamlFile = File(join(tempPackageDir.path, 'check.yaml'));
       final checkYamlFileContent = checkYamlFile.readAsStringSync();

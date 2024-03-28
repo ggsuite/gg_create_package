@@ -8,5 +8,5 @@
 String get checkSnippet => '''
 #!/usr/bin/env bash
 
-dart run gg_check all
+dart run gg can commit
 ''';
