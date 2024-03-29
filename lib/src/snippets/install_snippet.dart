@@ -8,7 +8,6 @@ import 'package:recase/recase.dart';
 
 /// Snippet for creating an exe and installing it in the system.
 String installSnippet({required String packageName}) {
-  final packageNameCamelCase = packageName.camelCase;
   final packageNameSnakeCase = packageName.snakeCase;
 
   return '''
@@ -18,28 +17,24 @@ library;
 
 import 'dart:io';
 
-import 'package:colorize/colorize.dart';
+import 'package:gg_console_colors/gg_console_colors.dart';
 
 // #############################################################################
 void main() {
-  const exe = '$packageNameCamelCase';
-  const src = 'bin/$packageNameSnakeCase.dart';
-  final installDir = '\${Platform.environment['HOME']}/.pub-cache/bin';
+  const exe = '$packageNameSnakeCase';
 
-  // Create install dir if it does not exist
-  if (!Directory(installDir).existsSync()) {
-    print('Creating \$installDir');
-    Directory(installDir).createSync(recursive: true);
-  }
+  print('Installing \$exe globally.');
 
-  final dest = '\$installDir/\$exe';
-  print('Installing \$exe in \$dest');
-  final result = Process.runSync('dart', ['compile', 'exe', src, '-o', dest]);
+  final result = Process.runSync(
+    'dart',
+    ['pub', 'global', 'activate', '--source', 'path', '.'],
+  );
 
   if (result.stderr.toString().trim().isNotEmpty) {
-    print('❌ \${Colorize(result.stderr.toString()).red()}');
+    print(red('❌ \${result.stderr.toString().trim()}'));
+    return;
   }
-  print(Colorize('✅ Installed \$exe in \$dest').green());
+  print(green('✅ Installed \$exe.'));
 }
 ''';
 }

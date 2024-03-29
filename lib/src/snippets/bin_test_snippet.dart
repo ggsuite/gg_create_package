@@ -22,7 +22,7 @@ String binTestSnippet({
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:colorize/colorize.dart';
+import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_capture_print/gg_capture_print.dart';
 import 'package:test/test.dart';
 
@@ -43,7 +43,7 @@ void main() {
 
       final expectedMessages = [
         'Invalid argument(s): Option',
-        Colorize('input').red().toString(),
+        red('input'),
         'is mandatory.',
       ];
 

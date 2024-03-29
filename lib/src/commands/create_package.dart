@@ -7,6 +7,7 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_create_package/src/snippets/bin_test_snippet.dart';
 import 'package:gg_create_package/src/snippets/check_snippet.dart';
 import 'package:gg_create_package/src/snippets/check_yaml_snippet.dart';
@@ -17,7 +18,6 @@ import 'package:gg_create_package/src/snippets/src_my_command_snippet.dart';
 import 'package:gg_create_package/src/snippets/test_my_command_test_snippet.dart';
 import 'package:gg_create_package/src/tools/gg_directory.dart';
 import 'package:gg_create_package/src/tools/checkout_directory.dart';
-import 'package:gg_create_package/src/tools/color.dart';
 import 'package:gg_create_package/src/tools/is_github_action.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:gg_log/gg_log.dart';
@@ -414,6 +414,13 @@ class _CreateDartPackage {
   }
 
   // ...........................................................................
+  void _appendInFile(String file, String text) {
+    var content = File(file).readAsStringSync();
+    content += text;
+    File(file).writeAsStringSync(content);
+  }
+
+  // ...........................................................................
   void _makeFileExecutable(String filePath) {
     // Execute chmod +x bin/$packageName.dart
     final result = Process.runSync(
@@ -443,6 +450,8 @@ class _CreateDartPackage {
         r'  # path:': '  path:',
       },
     );
+
+    _appendInFile(pubspecFile, '\nexecutables:\n $packageName:');
   }
 
   // ...........................................................................
@@ -630,7 +639,7 @@ class _CreateDartPackage {
     ggLog('Install dependencies...');
     const packages = [
       'args',
-      'colorize',
+      'gg_console_colors',
       'gg_process',
       'gg_args',
       'gg_log',
@@ -656,7 +665,7 @@ class _CreateDartPackage {
     ggLog('Install dev dependencies...');
     const packages = [
       'pana',
-      'gg',
+      'gg_install_gg',
       'gg_capture_print',
     ];
 
@@ -831,11 +840,11 @@ class _CreateDartPackage {
     }
 
     ggLog('\nSuccess! To open the project with visual studio code, call ');
-    ggLog('${greenStart}code $packageDir$end\n');
+    ggLog('${green('code $packageDir')}\n');
 
     if (prepareGitHub) {
       ggLog('To push the project to GitHub, call');
-      ggLog('${greenStart}git push -u origin main$end\n');
+      ggLog('${green('git push -u origin main')}\n');
       ggLog('Happy coding!');
     }
 

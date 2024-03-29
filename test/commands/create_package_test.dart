@@ -12,7 +12,6 @@ import 'package:gg_create_package/src/commands/create_package.dart';
 import 'package:gg_create_package/src/snippets/file_header_snippet.dart';
 import 'package:gg_create_package/src/snippets/open_source_licence_snippet.dart';
 import 'package:gg_create_package/src/snippets/private_license_snippet.dart';
-import 'package:gg_create_package/src/tools/color.dart';
 import 'package:gg_create_package/src/tools/is_github_action.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
@@ -425,7 +424,7 @@ void main() {
 
         expect(
           logMessages,
-          contains('${greenStart}code ${tempPackageDir.path}$end\n'),
+          contains(green('code ${tempPackageDir.path}')),
         );
 
         expect(
@@ -435,7 +434,7 @@ void main() {
 
         expect(
           logMessages,
-          contains('${greenStart}git push -u origin main$end\n'),
+          contains(green('git push -u origin main')),
         );
       }
     });
