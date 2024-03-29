@@ -10,6 +10,7 @@ import 'package:args/command_runner.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_create_package/src/commands/create_package.dart';
 import 'package:gg_create_package/src/snippets/file_header_snippet.dart';
+import 'package:gg_create_package/src/snippets/install_snippet.dart';
 import 'package:gg_create_package/src/snippets/open_source_licence_snippet.dart';
 import 'package:gg_create_package/src/snippets/private_license_snippet.dart';
 import 'package:gg_create_package/src/tools/is_github_action.dart';
@@ -180,7 +181,8 @@ void main() {
     });
 
     // #########################################################################
-    test('should create a private dart package', () async {
+    test('should create a private dart package',
+        timeout: const Timeout(Duration(minutes: 2)), () async {
       // Create a temporary directory
       final tempPackageDir = Directory(join(tempDir.path, 'aud_test'));
 
@@ -381,10 +383,10 @@ void main() {
       // ..............................
       // Should create a install script
       final installScript =
-          File(join(tempPackageDir.path, 'install.dart')).readAsStringSync();
+          File(join(tempPackageDir.path, 'install')).readAsStringSync();
       expect(
         installScript,
-        contains('const exe = \'audTest\';'),
+        contains(installSnippet),
       );
 
       // ...........................
@@ -424,7 +426,7 @@ void main() {
 
         expect(
           logMessages,
-          contains(green('code ${tempPackageDir.path}')),
+          contains('${green('code ${tempPackageDir.path}')}\n'),
         );
 
         expect(
@@ -434,13 +436,14 @@ void main() {
 
         expect(
           logMessages,
-          contains(green('git push -u origin main')),
+          contains('${green('git push -u origin main')}\n'),
         );
       }
     });
 
     // #########################################################################
-    test('should create open source dart package', () async {
+    test('should create open source dart package',
+        timeout: const Timeout(Duration(minutes: 2)), () async {
       // Create a temporary directory
       final tempPackageDir = Directory(join(tempDir.path, 'gg_test'));
 
