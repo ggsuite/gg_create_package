@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.3
+
+- Move install.dart -> install
+
 ## 1.0.2
 
 - Update to latest dependencies

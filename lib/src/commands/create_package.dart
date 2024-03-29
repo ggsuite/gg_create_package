@@ -600,11 +600,8 @@ class _CreateDartPackage {
   // ...........................................................................
   void _prepareInstallScript() {
     ggLog('Prepare install script...');
-    final installFile = join(packageDir, 'install.dart');
-    final installContent = installSnippet(packageName: packageName);
-    final content = formatter.format(
-      '$makeExecutableSnippet' '$fileHeaderSnippet\n\n' '$installContent\n',
-    );
+    final installFile = join(packageDir, 'install');
+    final content = installSnippet;
     File(installFile).writeAsStringSync(content);
     _makeFileExecutable(installFile);
   }

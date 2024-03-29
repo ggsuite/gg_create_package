@@ -10,7 +10,7 @@ import 'package:test/test.dart';
 void main() {
   group('InstallSnippet', () {
     test('should work fine', () {
-      expect(installSnippet(packageName: 'a_b_c'), isNotNull);
+      expect(installSnippet, isNotNull);
     });
   });
 }
