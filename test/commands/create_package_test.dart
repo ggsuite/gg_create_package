@@ -367,7 +367,10 @@ void main() {
       // Should init change log
       final changeLog =
           File(join(tempPackageDir.path, 'CHANGELOG.md')).readAsStringSync();
-      expect(changeLog, '# Change Log\n\n## 1.0.0\n\n- Initial version.\n');
+      expect(
+        changeLog,
+        '# Changelog\n\n## [Unreleased]\n\n- Initial version.\n',
+      );
 
       // .......................................
       // Should init executable in bin directory

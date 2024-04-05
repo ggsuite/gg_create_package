@@ -493,8 +493,8 @@ class _CreateDartPackage {
     ggLog('Prepare CHANGELOG.md...');
     final changeLogFile = File(join(packageDir, 'CHANGELOG.md'));
     String content = '';
-    content += '# Change Log\n\n';
-    content += '## 1.0.0\n\n';
+    content += '# Changelog\n\n';
+    content += '## [Unreleased]\n\n';
     content += '- Initial version.\n';
     changeLogFile.writeAsStringSync(content);
   }
