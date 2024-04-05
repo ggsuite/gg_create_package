@@ -440,11 +440,14 @@ class _CreateDartPackage {
     ggLog('Prepare pubspec.yaml...');
     final pubspecFile = join(packageDir, 'pubspec.yaml');
 
+    final publishTo = isOpenSource ? '' : '\npublish_to: none';
+
     _replaceInFile(
       pubspecFile,
       {
         r'sdk:.*': 'sdk: ">=3.3.0 <4.0.0"',
-        r'^#\srepository:.*': 'repository: $gitHubRepo/$packageName.git',
+        r'^#\srepository:.*':
+            'repository: $gitHubRepo/$packageName.git' '$publishTo',
         r'^description:.*': 'description: $description',
         r'^# Add regular dependencies here.\n': '',
         r'  # path:': '  path:',

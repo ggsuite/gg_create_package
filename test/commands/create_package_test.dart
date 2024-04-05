@@ -331,6 +331,9 @@ void main() {
       );
       expect(pubspec.contains(pattern), isTrue);
 
+      // Add »publish_to: none« to pubspec.yaml
+      expect(pubspec.contains('\npublish_to: none\n'), isTrue);
+
       // Should add gg_check command line to repo
       expect(pubspec, contains(RegExp(r'gg:')));
 
@@ -465,11 +468,16 @@ void main() {
 
       // .............................................
       // The package should contain an open source LICENSE file
-      // because it is not open source
+      // because it is open source
       expect(
         File(join(tempPackageDir.path, 'LICENSE')).readAsStringSync(),
         openSourceLicenseSnippet,
       );
+
+      // Do not add »publish_to: none« to pubspec.yaml
+      final pubspec =
+          await File(join(tempPackageDir.path, 'pubspec.yaml')).readAsString();
+      expect(pubspec.contains('publish_to: none'), isFalse);
     });
   });
 }
