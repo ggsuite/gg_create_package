@@ -494,8 +494,9 @@ class _CreateDartPackage {
     final changeLogFile = File(join(packageDir, 'CHANGELOG.md'));
     String content = '';
     content += '# Changelog\n\n';
-    content += '## [Unreleased]\n\n';
-    content += '- Initial version.\n';
+    content += '## Unreleased\n\n';
+    content += '### Added\n\n';
+    content += '- Initial boilerplate.\n';
     changeLogFile.writeAsStringSync(content);
   }
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- CHANGELOG.md boilerplate is not 100% cider compatible
+
 ## [1.0.1] - 2024-04-10
 
 ### Removed
@@ -12,8 +18,10 @@
 
 - Rework changelog
 - 'Github Actions Pipeline'
-- 'Github Actions Pipeline: Add SDK file containing flutter into .github/workflows to make github installing flutter and not dart SDK'
+- 'Github Actions Pipeline: Add SDK file containing flutter into
+.github/workflows to make github installing flutter and not dart SDK'
 - Prepare publish
 
+[Unreleased]: https://github.com/inlavigo/gg_create_package/compare/1.0.1...HEAD
 [1.0.1]: https://github.com/inlavigo/gg_create_package/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/inlavigo/gg_create_package/tag/%tag

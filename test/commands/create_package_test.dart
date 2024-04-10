@@ -369,7 +369,7 @@ void main() {
           File(join(tempPackageDir.path, 'CHANGELOG.md')).readAsStringSync();
       expect(
         changeLog,
-        '# Changelog\n\n## [Unreleased]\n\n- Initial version.\n',
+        '# Changelog\n\n## Unreleased\n\n### Added\n\n- Initial boilerplate.\n',
       );
 
       // .......................................
