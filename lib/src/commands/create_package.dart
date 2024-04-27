@@ -9,13 +9,13 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_create_package/src/snippets/bin_test_snippet.dart';
-import 'package:gg_create_package/src/snippets/check_snippet.dart';
-import 'package:gg_create_package/src/snippets/check_yaml_snippet.dart';
 import 'package:gg_create_package/src/snippets/install_snippet.dart';
 import 'package:gg_create_package/src/snippets/launch_json_test_snippet.dart';
 import 'package:gg_create_package/src/snippets/make_executable_snippet.dart';
 import 'package:gg_create_package/src/snippets/src_my_command_snippet.dart';
+import 'package:gg_create_package/src/snippets/src_snippet_with_command.dart';
 import 'package:gg_create_package/src/snippets/test_my_command_test_snippet.dart';
+import 'package:gg_create_package/src/snippets/test_snippet_with_command.dart';
 import 'package:gg_create_package/src/tools/gg_directory.dart';
 import 'package:gg_create_package/src/tools/checkout_directory.dart';
 import 'package:gg_create_package/src/tools/is_github_action.dart';
@@ -31,8 +31,8 @@ import '../snippets/launch_json_snippet.dart';
 import '../snippets/lib_snippet.dart';
 import '../snippets/open_source_licence_snippet.dart';
 import '../snippets/private_license_snippet.dart';
-import '../snippets/src_snippet.dart';
-import '../snippets/test_snippet.dart';
+import '../snippets/src_snippet_without_command.dart';
+import '../snippets/test_snippet_without_command.dart';
 
 /// Creates a new package in the given directory.
 class CreatePackage extends Command<dynamic> {
@@ -97,6 +97,24 @@ class CreatePackage extends Command<dynamic> {
       negatable: true,
       defaultsTo: false,
     );
+
+    // Add the cli option
+    argParser.addFlag(
+      'cli',
+      abbr: 'c',
+      help: 'Do (not) create a command line interface.',
+      negatable: true,
+      defaultsTo: true,
+    );
+
+    // Add the example option
+    argParser.addFlag(
+      'example',
+      abbr: 'e',
+      help: 'Do (not) create an example.',
+      negatable: true,
+      defaultsTo: true,
+    );
   }
   // ...........................................................................
   /// The log function
@@ -119,6 +137,8 @@ class CreatePackage extends Command<dynamic> {
     final isOpenSource = argResults?['open-source'] as bool;
     final pushToGitHub = argResults?['prepare-github'] as bool;
     final force = argResults?['force'] as bool;
+    final createCli = argResults?['cli'] as bool;
+    final createExample = argResults?['example'] as bool;
 
     final updatedOutputDir = outputDir.replaceAll('~', homeDirectory);
 
@@ -135,6 +155,8 @@ class CreatePackage extends Command<dynamic> {
       isOpenSource: isOpenSource,
       prepareGitHub: pushToGitHub,
       force: force,
+      createCli: createCli,
+      createExample: createExample,
     ).run();
   }
 
@@ -154,6 +176,8 @@ class _CreateDartPackage {
     required this.isOpenSource,
     required this.prepareGitHub,
     required this.force,
+    required this.createCli,
+    required this.createExample,
   });
 
   final String outputDir;
@@ -164,6 +188,8 @@ class _CreateDartPackage {
   final bool isOpenSource;
   final bool prepareGitHub;
   final bool force;
+  final bool createCli;
+  final bool createExample;
   static const gitHubRepo = 'https://github.com/inlavigo';
   final formatter = DartFormatter();
 
@@ -171,7 +197,7 @@ class _CreateDartPackage {
   Future<void> run() async {
     ggLog('\nCreate dart package...\n');
 
-    _deleteExistingPackage();
+    await _deleteExistingPackage();
     _checkDirectories();
     _checkPackageName();
     _checkDescription();
@@ -181,38 +207,65 @@ class _CreateDartPackage {
     _copyGitIgnore();
     _copyAnalysisOptions();
     _copyLicense();
-    _initCheck();
     _copyGitHubActions();
     _preparePubspec();
     _prepareReadme();
-    _prepareLaunchJson();
-    _prepareLaunchJsonTest();
+
+    if (createCli) {
+      _prepareLaunchJson();
+      _prepareLaunchJsonTest();
+    }
+
     _prepareChangeLog();
-    _prepareCommand();
-    _prepareSubCommand();
+    _prepareMainSrcFile();
+
+    if (createCli) {
+      _prepareSubCommand();
+    }
+
     _prepareLib();
-    _prepareBin();
-    _prepareBinTest();
-    _prepareCommandTest();
-    _prepareSubCommandTest();
-    _prepareExample();
-    _prepareInstallScript();
+
+    if (createCli) {
+      _prepareBin();
+      _prepareBinTest();
+      _prepareSubCommandTest();
+    }
+
+    _prepareMainSrcFileTest();
+
+    if ((createExample)) {
+      _prepareExample();
+    } else {
+      await _removeExample();
+    }
+
+    if (createCli) {
+      _prepareInstallScript();
+    }
+
     _removeUnusedFiles();
     _installDevDependencies();
     _installDependencies();
+    _runDartPubGet();
     await _waitShortly();
     _fixErrorsAndWarnings();
     _initGit();
   }
 
   // ...........................................................................
-  void _deleteExistingPackage() {
+  Future<void> _deleteExistingPackage() async {
     if (!force) return;
 
     ggLog('Delete existing package...');
-    final packageDir = join(outputDir, packageName);
-    if (Directory(packageDir).existsSync()) {
-      Directory(packageDir).deleteSync(recursive: true);
+    final packageDir = Directory(join(outputDir, packageName));
+    if (await packageDir.exists()) {
+      await for (final entity in packageDir.list(recursive: false)) {
+        if (entity is File) {
+          await entity.delete();
+        } else if (entity is Directory) {
+          await entity.delete(recursive: true);
+        }
+      }
     }
   }
 
@@ -227,7 +280,7 @@ class _CreateDartPackage {
 
     // Package already exists?
     final packageDir = join(outputDir, packageName);
-    if (Directory(packageDir).existsSync()) {
+    if (!force && Directory(packageDir).existsSync()) {
       throw Exception('The directory "$packageDir" already exists.');
     }
   }
@@ -287,7 +340,14 @@ class _CreateDartPackage {
     // Create the dart package
     final result = await Process.run(
       'dart',
-      ['create', '-t', 'package', packageName, '--no-pub'],
+      [
+        'create',
+        '-t',
+        'package',
+        packageName,
+        '--no-pub',
+        force ? '--force' : '',
+      ],
       workingDirectory: outputDir,
     );
 
@@ -368,23 +428,6 @@ class _CreateDartPackage {
   }
 
   // ...........................................................................
-  void _initCheck() {
-    ggLog('Copy checks...');
-
-    // Write check.yaml file
-    final checkYaml = checkYamlSnippet;
-    File(join(packageDir, 'check.yaml')).writeAsStringSync(checkYaml);
-
-    // Write ./check
-    final checkFile = join(packageDir, 'check');
-    final checkContent = checkSnippet;
-    File(checkFile).writeAsStringSync(checkContent);
-
-    // Make ./check executable
-    _makeFileExecutable(checkFile);
-  }
-
-  // ...........................................................................
   void _copyGitHubActions() {
     ggLog('Copy GitHub Actions...');
     // Copy over GitHub Actions
@@ -454,7 +497,9 @@ class _CreateDartPackage {
       },
     );
 
-    _appendInFile(pubspecFile, '\nexecutables:\n $packageName:');
+    if (createCli) {
+      _appendInFile(pubspecFile, '\nexecutables:\n $packageName:');
+    }
   }
 
   // ...........................................................................
@@ -501,11 +546,15 @@ class _CreateDartPackage {
   }
 
   // ...........................................................................
-  void _prepareCommand() {
+  void _prepareMainSrcFile() {
+    ggLog('Prepare src ...');
     ggLog('Prepare src ...');
     final implementationFile =
         join(packageDir, 'lib', 'src', '$packageName.dart');
-    final implementationSnippet = srcSnippet(packageName: packageName);
+    final implementationSnippet =
+        (createCli ? srcSnippetWithCommand : srcSnippetWithoutCommand)
+            .call(packageName: packageName);
+
     final content =
         formatter.format('$fileHeaderSnippet\n\n$implementationSnippet\n');
     File(implementationFile).writeAsStringSync(content);
@@ -561,12 +610,15 @@ class _CreateDartPackage {
   }
 
   // ...........................................................................
-  void _prepareCommandTest() {
+  void _prepareMainSrcFileTest() {
     ggLog('Prepare test folder...');
     final testFolder = join(packageDir, 'test');
     Directory(testFolder).createSync();
     final testFile = join(testFolder, '${packageName}_test.dart');
-    final testFileContent = testSnippet(packageName: packageName);
+    final testFileContent =
+        (createCli ? testSnippetWithCommand : testSnippetWithoutCommand)
+            .call(packageName: packageName);
+
     final content =
         formatter.format('$fileHeaderSnippet\n\n$testFileContent\n');
     File(testFile).writeAsStringSync(content);
@@ -599,6 +651,15 @@ class _CreateDartPackage {
 
     File(exampleFile).writeAsStringSync(content);
     _makeFileExecutable(exampleFile);
+  }
+
+  // ...........................................................................
+  Future<void> _removeExample() async {
+    ggLog('Remove example folder...');
+    final exampleFolder = join(packageDir, 'example');
+    if (await Directory(exampleFolder).exists()) {
+      await Directory(exampleFolder).delete(recursive: true);
+    }
   }
 
   // ...........................................................................
@@ -638,14 +699,17 @@ class _CreateDartPackage {
   // ...........................................................................
   void _installDependencies() {
     ggLog('Install dependencies...');
-    const packages = [
-      'args',
-      'gg_console_colors',
-      'gg_process',
-      'gg_args',
-      'gg_log',
+    final packages = [
+      if (createCli) 'args',
+      if (createCli) 'gg_console_colors',
+      if (createCli) 'gg_process',
+      if (createCli) 'gg_args',
+      if (createCli) 'gg_log',
     ];
-    const options = ['pub', 'add', ...packages];
+
+    if (packages.isEmpty) return;
+
+    final options = ['pub', 'add', ...packages];
     final result = Process.runSync(
       'dart',
       options,
@@ -664,13 +728,15 @@ class _CreateDartPackage {
   // ...........................................................................
   void _installDevDependencies() {
     ggLog('Install dev dependencies...');
-    const packages = [
-      'pana',
-      'gg_install_gg',
-      'gg_capture_print',
+    final packages = [
+      if (createCli) 'gg_capture_print',
     ];
 
-    const options = ['pub', 'add', '--dev', ...packages];
+    if (packages.isEmpty) {
+      return;
+    }
+
+    final options = ['pub', 'add', '--dev', ...packages];
 
     final result = Process.runSync(
       'dart',
@@ -682,6 +748,25 @@ class _CreateDartPackage {
       // coverage:ignore-start
       throw Exception(
         'Error while running "dart ${options.join(' ')}"',
+      );
+      // coverage:ignore-end
+    }
+  }
+
+  // ...........................................................................
+  void _runDartPubGet() {
+    ggLog('Run dart pub get ...');
+
+    final result = Process.runSync(
+      'dart',
+      ['pub', 'get'],
+      workingDirectory: packageDir,
+    );
+
+    if (result.exitCode != 0) {
+      // coverage:ignore-start
+      throw Exception(
+        'Error while running "dart pub get"',
       );
       // coverage:ignore-end
     }

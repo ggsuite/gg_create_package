@@ -4,14 +4,13 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-import 'package:gg_create_package/src/snippets/check_snippet.dart';
+import 'package:gg_create_package/src/snippets/src_snippet_with_command.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('CheckSnippet', () {
+  group('SrcSnippet', () {
     test('should work fine', () {
-      // const CheckSnippet();
-      expect(checkSnippet, isNotNull);
+      expect(srcSnippetWithCommand(packageName: 'AbcPacket'), isNotNull);
     });
   });
 }

@@ -7,7 +7,7 @@
 import 'package:recase/recase.dart';
 
 /// The snippet for the source file
-String srcSnippet({required String packageName}) {
+String srcSnippetWithCommand({required String packageName}) {
   final packageNamePascalCase = packageName.pascalCase;
   final packageNameCamelCase = packageName.camelCase;
 
