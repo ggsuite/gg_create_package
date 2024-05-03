@@ -414,6 +414,53 @@ void main() {
           );
         });
       });
+
+      group('package with flutter', () {
+        test('when options --flutter are provided', () async {
+          // Create a temporary directory
+          final tempPackageDir = Directory(join(tempDir.path, 'gg_test'));
+
+          // Expect does not throw exception
+          await r.run([
+            'cp',
+            '-o',
+            tempDir.path,
+            '-n',
+            'gg_test',
+            '--open-source',
+            '-d',
+            description,
+            '--flutter',
+            '--no-cli',
+            '--no-example',
+            '--no-prepare-github',
+          ]);
+
+          // The package should exist
+          expect(tempPackageDir.existsSync(), true);
+
+          // The package contains an pubspec.yaml file
+          expect(
+            await File(join(tempPackageDir.path, 'pubspec.yaml')).exists(),
+            true,
+          );
+
+          // Pubspec.yaml should contain the flutter dependency
+          final pubspec = await File(join(tempPackageDir.path, 'pubspec.yaml'))
+              .readAsString();
+          expect(pubspec.contains('  flutter: \''), isTrue);
+          expect(pubspec.contains('sdk: flutter'), isTrue);
+          expect(pubspec.contains('flutter_test:'), isTrue);
+
+          // Test files should import the flutter_test package
+          final testFile = File(
+            join(tempPackageDir.path, 'test', 'gg_test_test.dart'),
+          );
+          expect(testFile.existsSync(), isTrue);
+          final testFileContent = testFile.readAsStringSync();
+          expect(testFileContent, contains('import \'package:flutter_test/'));
+        });
+      });
     });
 
     group('should throw', () {

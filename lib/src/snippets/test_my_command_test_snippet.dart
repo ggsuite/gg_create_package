@@ -7,15 +7,19 @@
 import 'package:recase/recase.dart';
 
 /// The snippet for the test file of MyCommand
-String testMyCommandTestSnippet({required String packageName}) {
+String testMyCommandTestSnippet({
+  required String packageName,
+  bool isFlutter = false,
+}) {
   final packageNameSnakeCase = packageName.snakeCase;
+  final isFlutterPrefix = isFlutter ? 'flutter_' : '';
 
   return '''
 
 import 'package:args/command_runner.dart';
 import 'package:gg_capture_print/gg_capture_print.dart';
 import 'package:$packageNameSnakeCase/src/commands/my_command.dart';
-import 'package:test/test.dart';
+import 'package:${isFlutterPrefix}test/${isFlutterPrefix}test.dart';
 
 void main() {
   final messages = <String>[];

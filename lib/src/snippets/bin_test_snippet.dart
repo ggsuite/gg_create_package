@@ -15,8 +15,10 @@ import 'package:recase/recase.dart';
 /// The snippet for the bin/dart file
 String binTestSnippet({
   required String packageName,
+  bool isFlutter = false,
 }) {
   final packageSnakeCase = packageName.snakeCase;
+  final isFlutterPrefix = isFlutter ? 'flutter_' : '';
 
   return '''
 import 'dart:convert';
@@ -24,7 +26,8 @@ import 'dart:io';
 
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_capture_print/gg_capture_print.dart';
-import 'package:test/test.dart';
+
+import 'package:${isFlutterPrefix}test/${isFlutterPrefix}test.dart';
 
 import '../../bin/$packageSnakeCase.dart';
 

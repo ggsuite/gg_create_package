@@ -7,16 +7,20 @@
 import 'package:recase/recase.dart';
 
 /// The snippet for the test file
-String testSnippetWithoutCommand({required String packageName}) {
+String testSnippetWithoutCommand({
+  required String packageName,
+  bool isFlutter = false,
+}) {
   final packageNamePascalCase = packageName.pascalCase;
   final packageNameCamelCase = packageName.camelCase;
   final packageNameSnakeCase = packageName.snakeCase;
+  final isFlutterPrefix = isFlutter ? 'flutter_' : '';
 
   return '''
 import 'dart:io';
 
 import 'package:$packageNameSnakeCase/$packageNameSnakeCase.dart';
-import 'package:test/test.dart';
+import 'package:${isFlutterPrefix}test/${isFlutterPrefix}test.dart';
 
 void main() {
   group('$packageNamePascalCase()', () {

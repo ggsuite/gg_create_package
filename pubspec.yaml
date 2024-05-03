@@ -18,6 +18,7 @@ dependencies:
   gg_args: ^2.0.2
   gg_log: ^1.0.0
   gg_console_colors: ^2.0.2
+  pubspec: ^2.3.0
 
 dev_dependencies:
   gg_capture_print: ^1.0.2

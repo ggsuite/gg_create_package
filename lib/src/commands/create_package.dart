@@ -23,6 +23,7 @@ import 'package:dart_style/dart_style.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:path/path.dart';
 import 'package:recase/recase.dart';
+import 'package:pubspec/pubspec.dart';
 
 import '../snippets/bin_snippet.dart';
 import '../snippets/example_snippet.dart';
@@ -36,6 +37,12 @@ import '../snippets/test_snippet_without_command.dart';
 
 /// Creates a new package in the given directory.
 class CreatePackage extends Command<dynamic> {
+  /// The dart SDK constraint
+  static const dartSdkConstraint = '>=3.3.0 <4.0.0';
+
+  /// The flutter SDK constraint
+  static const flutterSdkConstraint = '>=3.19.0';
+
   /// The name of the package
   @override
   final name = 'cp';
@@ -115,6 +122,15 @@ class CreatePackage extends Command<dynamic> {
       negatable: true,
       defaultsTo: true,
     );
+
+    // Add the example option
+    argParser.addFlag(
+      'flutter',
+      abbr: 'l',
+      help: 'Create a flutter package',
+      negatable: false,
+      defaultsTo: false,
+    );
   }
   // ...........................................................................
   /// The log function
@@ -139,6 +155,7 @@ class CreatePackage extends Command<dynamic> {
     final force = argResults?['force'] as bool;
     final createCli = argResults?['cli'] as bool;
     final createExample = argResults?['example'] as bool;
+    final createFlutterPackage = argResults?['flutter'] as bool;
 
     final updatedOutputDir = outputDir.replaceAll('~', homeDirectory);
 
@@ -157,6 +174,7 @@ class CreatePackage extends Command<dynamic> {
       force: force,
       createCli: createCli,
       createExample: createExample,
+      createFlutterPackage: createFlutterPackage,
     ).run();
   }
 
@@ -178,6 +196,7 @@ class _CreateDartPackage {
     required this.force,
     required this.createCli,
     required this.createExample,
+    required this.createFlutterPackage,
   });
 
   final String outputDir;
@@ -190,6 +209,7 @@ class _CreateDartPackage {
   final bool force;
   final bool createCli;
   final bool createExample;
+  final bool createFlutterPackage;
   static const gitHubRepo = 'https://github.com/inlavigo';
   final formatter = DartFormatter();
 
@@ -241,6 +261,10 @@ class _CreateDartPackage {
 
     if (createCli) {
       _prepareInstallScript();
+    }
+
+    if (createFlutterPackage) {
+      await _addFlutterSdk();
     }
 
     _removeUnusedFiles();
@@ -488,7 +512,7 @@ class _CreateDartPackage {
     _replaceInFile(
       pubspecFile,
       {
-        r'sdk:.*': 'sdk: ">=3.3.0 <4.0.0"',
+        r'sdk:.*': 'sdk: "${CreatePackage.dartSdkConstraint}"',
         r'^#\srepository:.*':
             'repository: $gitHubRepo/$packageName.git' '$publishTo',
         r'^description:.*': 'description: $description',
@@ -528,7 +552,10 @@ class _CreateDartPackage {
 
     final launchJsonTestFile =
         join(packageDir, 'test', 'vscode', 'launch_json_test.dart');
-    final snippet = launchJsonTestSnippet(packageName: packageName);
+    final snippet = launchJsonTestSnippet(
+      packageName: packageName,
+      isFlutter: createFlutterPackage,
+    );
     final content = formatter.format('$fileHeaderSnippet\n\n$snippet\n');
     File(launchJsonTestFile).writeAsStringSync(content);
   }
@@ -601,6 +628,7 @@ class _CreateDartPackage {
     final binTestFile = join(binTestFolder, '${packageName}_test.dart');
     var fileContent = binTestSnippet(
       packageName: packageName,
+      isFlutter: createFlutterPackage,
     );
 
     fileContent = '$fileHeaderSnippet\n\n' '$fileContent\n';
@@ -616,8 +644,10 @@ class _CreateDartPackage {
     Directory(testFolder).createSync();
     final testFile = join(testFolder, '${packageName}_test.dart');
     final testFileContent =
-        (createCli ? testSnippetWithCommand : testSnippetWithoutCommand)
-            .call(packageName: packageName);
+        (createCli ? testSnippetWithCommand : testSnippetWithoutCommand).call(
+      packageName: packageName,
+      isFlutter: createFlutterPackage,
+    );
 
     final content =
         formatter.format('$fileHeaderSnippet\n\n$testFileContent\n');
@@ -630,7 +660,10 @@ class _CreateDartPackage {
     final testFolder = join(packageDir, 'test', 'commands');
     Directory(testFolder).createSync(recursive: true);
     final testFile = join(testFolder, 'my_command_test.dart');
-    final testFileContent = testMyCommandTestSnippet(packageName: packageName);
+    final testFileContent = testMyCommandTestSnippet(
+      packageName: packageName,
+      isFlutter: createFlutterPackage,
+    );
     final content =
         formatter.format('$fileHeaderSnippet\n\n$testFileContent\n');
     File(testFile).writeAsStringSync(content);
@@ -695,6 +728,41 @@ class _CreateDartPackage {
     final content = formatter.format('$fileHeaderSnippet\n\n$libDartContent\n');
     File(libDartFile).writeAsStringSync(content);
   }
+
+  // ######################
+  // Flutter
+  // ######################
+
+  Future<void> _addFlutterSdk() async {
+    // specify the directory
+    var myDirectory = Directory(packageDir);
+
+    // Add flutter SDK
+    var pubSpec = (await PubSpec.load(myDirectory)).copy(
+      dependencies: {
+        'flutter': const SdkReference('flutter'),
+      },
+    ).copy(
+      devDependencies: {
+        'flutter_lints': DependencyReference.fromJson('^3.0.0'),
+        'flutter_test': const SdkReference('flutter'),
+      },
+    ).copy(
+      environment: Environment.fromJson(
+        {
+          'flutter': CreatePackage.flutterSdkConstraint,
+          'sdk': CreatePackage.dartSdkConstraint,
+        },
+      ),
+    );
+
+    // save it
+    await pubSpec.save(myDirectory);
+  }
+
+  // ######################
+  // Dependencies
+  // ######################
 
   // ...........................................................................
   void _installDependencies() {
@@ -778,6 +846,10 @@ class _CreateDartPackage {
     await Future<void>.delayed(const Duration(milliseconds: 500));
   }
 
+  // ######################
+  // Fix stuff
+  // ######################
+
   // ...........................................................................
   void _fixErrorsAndWarnings() {
     ggLog('Fix errors and warnings...');
@@ -832,6 +904,10 @@ class _CreateDartPackage {
       // coverage:ignore-end
     }
   }
+
+  // ######################
+  // Prepare Git
+  // ######################
 
   // ...........................................................................
   void _initGit() {

@@ -7,15 +7,19 @@
 import 'package:recase/recase.dart';
 
 /// Snippet for a test that checks the launch.json file.
-String launchJsonTestSnippet({required String packageName}) {
+String launchJsonTestSnippet({
+  required String packageName,
+  bool isFlutter = false,
+}) {
   final packageNameCamelCase = packageName.camelCase;
   final packageNameSnakeCase = packageName.snakeCase;
+  final isFlutterPrefix = isFlutter ? 'flutter_' : '';
 
   return '''
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:test/test.dart';
+import 'package:${isFlutterPrefix}test/${isFlutterPrefix}test.dart';
 
 void main() {
   // #########################################################################

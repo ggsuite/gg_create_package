@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.1] - 2024-05-03
+
+### Added
+
+- Add --flutter option to create flutter packages
+
 ## [2.0.0] - 2024-04-27
 
 ### Added
@@ -47,6 +53,7 @@
 .github/workflows to make github installing flutter and not dart SDK'
 - Prepare publish
 
+[2.0.1]: https://github.com/inlavigo/gg_create_package/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/inlavigo/gg_create_package/compare/1.0.3...2.0.0
 [1.0.3]: https://github.com/inlavigo/gg_create_package/compare/1.0.2...1.0.3
 [1.0.2]: https://github.com/inlavigo/gg_create_package/compare/1.0.1...1.0.2
