@@ -461,6 +461,25 @@ void main() {
           expect(testFileContent, contains('import \'package:flutter_test/'));
         });
       });
+
+      group('package without prefix', () {
+        test('when option --no-prefix is provided', () async {
+          // Expect does not throw exception
+          await r.run([
+            'cp',
+            '-o',
+            tempDir.path,
+            '-n',
+            'test',
+            '--open-source',
+            '-d',
+            description,
+            '--no-prepare-github',
+            '--dry-run',
+            '--no-enforce-prefix',
+          ]);
+        });
+      });
     });
 
     group('should throw', () {
