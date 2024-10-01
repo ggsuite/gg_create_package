@@ -527,16 +527,19 @@ class _CreateDartPackage {
   void _makeFileExecutable(String filePath) {
     if (dryRun) return;
     // Execute chmod +x bin/$packageName.dart
+    if (Platform.isWindows) {
+      return;
+    }
+    // coverage:ignore-start
     final result = Process.runSync(
       'chmod',
       ['+x', filePath],
     );
 
     if (result.exitCode != 0) {
-      // coverage:ignore-start
       throw Exception('Error while running "chmod +x $filePath"');
-      // coverage:ignore-end
     }
+    // coverage:ignore-end
   }
 
   // ...........................................................................

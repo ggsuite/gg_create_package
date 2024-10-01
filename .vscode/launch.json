@@ -5,13 +5,11 @@
  * Use of this source code is governed by terms that can be
  * found in the LICENSE file in the root of this package.
  */
-
 {
   // Use IntelliSense to learn about possible attributes.
   // Hover to view descriptions of existing attributes.
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
-
   "configurations": [
     {
       "name": "Run current file",
@@ -20,17 +18,18 @@
       "program": "${workspaceFolder}/bin/gg_create_package.dart",
       "args": [
         "cp",
-
         "-n",
-        "aud_ab_space_widget",
+        "gg_to_local",
         "-d",
-        "aud_ab_space_widget renders several layers of an AbSpace efficiently.",
-        "--no-open-source",
-        "--no-cli",
-        "--flutter",
+        "gg_to_local allows to switch a local package and its local checkouts to local pathes",
+        "--open-source",
+        "--example",
+        "--cli",
+        "--prepare-github",
+        "--enforce-prefix",
         "--force"
       ],
-      "cwd": "${workspaceFolder}"
+      "cwd": "P:\\grace_cloud"
     },
     {
       "name": "Test Current File",

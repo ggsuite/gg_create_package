@@ -1,10 +1,14 @@
 # Changelog
 
-## [Unreleased]
+## [2.0.2] - 2024-10-01
 
 ### Added
 
 - Add option --dry-run, add option --no-enforce-prefix
+
+### Changed
+
+- Make unit tests run under Windows
 
 ## [2.0.1] - 2024-05-03
 
@@ -59,7 +63,7 @@
 .github/workflows to make github installing flutter and not dart SDK'
 - Prepare publish
 
-[Unreleased]: https://github.com/inlavigo/gg_create_package/compare/2.0.1...HEAD
+[2.0.2]: https://github.com/inlavigo/gg_create_package/compare/2.0.1...2.0.2
 [2.0.1]: https://github.com/inlavigo/gg_create_package/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/inlavigo/gg_create_package/compare/1.0.3...2.0.0
 [1.0.3]: https://github.com/inlavigo/gg_create_package/compare/1.0.2...1.0.3

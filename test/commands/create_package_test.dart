@@ -17,6 +17,8 @@ import 'package:gg_create_package/src/tools/is_github_action.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 
+String ps = Platform.pathSeparator;
+
 void main() {
   final tempDir =
       Directory('/tmp').existsSync() ? Directory('/tmp') : Directory.systemTemp;
@@ -553,7 +555,7 @@ void main() {
             isA<Exception>().having(
               (e) => e.toString(),
               'message',
-              'Exception: The directory "${tempDir.path}/aud_test" already '
+              'Exception: The directory "${tempDir.path}${ps}aud_test" already '
                   'exists.',
             ),
           ),
