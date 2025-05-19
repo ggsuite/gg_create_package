@@ -29,7 +29,7 @@ void main() {
   // ...........................................................................
   setUp(() {
     logMessages.clear();
-    final audTestDir = Directory(join(tempDir.path, 'aud_test'));
+    final audTestDir = Directory(join(tempDir.path, 'gg_foo'));
     if (audTestDir.existsSync()) {
       audTestDir.deleteSync(recursive: true);
     }
@@ -54,7 +54,7 @@ void main() {
         test('private package with CLI',
             timeout: const Timeout(Duration(minutes: 2)), () async {
           // Create a temporary directory
-          final tempPackageDir = Directory(join(tempDir.path, 'aud_test'));
+          final tempPackageDir = Directory(join(tempDir.path, 'gg_foo'));
 
           // Create the package directory
           tempPackageDir.createSync();
@@ -74,9 +74,11 @@ void main() {
               '-o',
               tempDir.path,
               '-n',
-              'aud_test',
+              'gg_foo',
               '-d',
               description,
+              '--github-org',
+              'ggsuite',
               '--prepare-github',
               '--force',
             ]);
@@ -171,7 +173,7 @@ void main() {
 
           final launchJsonTestFileContent =
               launchJsonTestFile.readAsStringSync();
-          expect(launchJsonTestFileContent, contains('bin/aud_test.dart'));
+          expect(launchJsonTestFileContent, contains('bin/gg_foo.dart'));
 
           // .......................................................
           // The package should contain a analysis_options.yaml file
@@ -210,7 +212,7 @@ void main() {
           final pubspec = File(join(tempPackageDir.path, 'pubspec.yaml'))
               .readAsStringSync();
           final pattern = RegExp(
-            r'^repository: https://github.com/inlavigo/aud_test.git$',
+            r'^repository: https://github.com/ggsuite/gg_foo.git$',
             multiLine: true,
           );
           expect(pubspec.contains(pattern), isTrue);
@@ -224,14 +226,14 @@ void main() {
               File(join(tempPackageDir.path, '.vscode', 'launch.json'))
                   .readAsStringSync();
 
-          expect(launchJson, contains(r'"name": "aud_test.dart"'));
+          expect(launchJson, contains(r'"name": "gg_foo.dart"'));
           expect(
             launchJson,
-            contains(r'"program": "${workspaceFolder}/bin/aud_test.dart"'),
+            contains(r'"program": "${workspaceFolder}/bin/gg_foo.dart"'),
           );
           expect(
             launchJson,
-            contains(r'"program": "${workspaceFolder}/bin/aud_test.dart"'),
+            contains(r'"program": "${workspaceFolder}/bin/gg_foo.dart"'),
           );
 
           // ....................
@@ -241,7 +243,7 @@ void main() {
 
           expect(
               readme,
-              '# aud_test\n\nThis is a description of the package. '
+              '# gg_foo\n\nThis is a description of the package. '
               'It should be at least 60 characters long.\n');
 
           // ......................
@@ -256,18 +258,17 @@ void main() {
 
           // .......................................
           // Should init executable in bin directory
-          final binFile =
-              File(join(tempPackageDir.path, 'bin', 'aud_test.dart'));
+          final binFile = File(join(tempPackageDir.path, 'bin', 'gg_foo.dart'));
           expect(binFile.existsSync(), isTrue);
           final binFileContent = binFile.readAsStringSync();
           expect(binFileContent, startsWith('#!/usr/bin/env dart\n'));
           expect(binFileContent, contains(fileHeaderSnippet));
           expect(
             binFileContent,
-            contains('import \'package:aud_test/aud_test.dart\';'),
+            contains('import \'package:gg_foo/gg_foo.dart\';'),
           );
           expect(binFileContent, contains('Future<void> run({'));
-          expect(binFileContent, contains('command: AudTest(ggLog: ggLog),'));
+          expect(binFileContent, contains('command: GgFoo(ggLog: ggLog),'));
 
           // ..............................
           // Should create a install script
@@ -279,16 +280,16 @@ void main() {
           );
 
           // ...........................
-          // Should delete aud_test_base
+          // Should delete gg_foo_base
           final audTestBaseFile = File(
-            join(tempPackageDir.path, 'lib', 'src', 'aud_test_base.dart'),
+            join(tempPackageDir.path, 'lib', 'src', 'gg_foo_base.dart'),
           );
           expect(audTestBaseFile.existsSync(), isFalse);
 
           // .........................................
-          // Should create test/bin/aud_test_test.dart
+          // Should create test/bin/gg_foo_test.dart
           final testFile = File(
-            join(tempPackageDir.path, 'test', 'bin', 'aud_test_test.dart'),
+            join(tempPackageDir.path, 'test', 'bin', 'gg_foo_test.dart'),
           );
           expect(testFile.existsSync(), isTrue);
 
@@ -347,6 +348,8 @@ void main() {
             '--open-source',
             '-d',
             description,
+            '--github-org',
+            'ggsuite',
             '--no-prepare-github',
           ]);
 
@@ -383,6 +386,8 @@ void main() {
             '--open-source',
             '-d',
             description,
+            '--github-org',
+            'ggsuite',
             '--no-prepare-github',
             '--no-cli',
             '--no-example',
@@ -435,6 +440,8 @@ void main() {
             '--flutter',
             '--no-cli',
             '--no-example',
+            '--github-org',
+            'ggsuite',
             '--no-prepare-github',
           ]);
 
@@ -463,25 +470,6 @@ void main() {
           expect(testFileContent, contains('import \'package:flutter_test/'));
         });
       });
-
-      group('package without prefix', () {
-        test('when option --no-prefix is provided', () async {
-          // Expect does not throw exception
-          await r.run([
-            'cp',
-            '-o',
-            tempDir.path,
-            '-n',
-            'test',
-            '--open-source',
-            '-d',
-            description,
-            '--no-prepare-github',
-            '--dry-run',
-            '--no-enforce-prefix',
-          ]);
-        });
-      });
     });
 
     group('should throw', () {
@@ -493,9 +481,11 @@ void main() {
             '-o',
             'some unknown directory',
             '-n',
-            'aud_test',
+            'gg_foo',
             '-d',
             description,
+            '--github-org',
+            'ggsuite',
             '--no-prepare-github',
           ]),
           throwsA(
@@ -517,9 +507,11 @@ void main() {
             '-o',
             tempDir.path,
             '-n',
-            'aud_test',
+            'gg_foo',
             '-d',
             'This description is less then 60 chars.',
+            '--github-org',
+            'ggsuite',
             '--no-prepare-github',
           ]),
           throwsA(
@@ -534,7 +526,7 @@ void main() {
 
       test('when the package directory already exists', () {
         // Create a temporary directory
-        final tempPackageDir = Directory(join(tempDir.path, 'aud_test'));
+        final tempPackageDir = Directory(join(tempDir.path, 'gg_foo'));
 
         // Create the package directory
         tempPackageDir.createSync();
@@ -546,65 +538,19 @@ void main() {
             '-o',
             tempDir.path,
             '-n',
-            'aud_test',
+            'gg_foo',
             '-d',
             description,
+            '--github-org',
+            'ggsuite',
             '--no-prepare-github',
           ]),
           throwsA(
             isA<Exception>().having(
               (e) => e.toString(),
               'message',
-              'Exception: The directory "${tempDir.path}${ps}aud_test" already '
+              'Exception: The directory "${tempDir.path}/gg_foo" already '
                   'exists.',
-            ),
-          ),
-        );
-      });
-
-      test('when is not open source and the name not starts with "aud_"', () {
-        // Expect throws exception
-        expect(
-          r.run([
-            'cp',
-            '-o',
-            tempDir.path,
-            '-n',
-            'xyz_test',
-            '--no-open-source',
-            '-d',
-            '--no-prepare-github',
-            description,
-          ]),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              'Exception: Non open source packages should start with "aud_"',
-            ),
-          ),
-        );
-      });
-
-      test('when open source and the name not starts with "gg_"', () {
-        // Expect throws exception
-        expect(
-          r.run([
-            'cp',
-            '-o',
-            tempDir.path,
-            '-n',
-            'xyz_test',
-            '--open-source',
-            '-d',
-            '--no-prepare-github',
-            description,
-          ]),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              'Exception: Open source packages should start with "gg_"',
             ),
           ),
         );
