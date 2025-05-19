@@ -1,6 +1,6 @@
 name: gg_create_package
 description: A command line tool to create dart packages
-version: 4.0.0
+version: 4.0.1
 repository: https://github.com/ggsuite/gg_create_package.git
 
 environment:
