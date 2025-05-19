@@ -1,12 +1,18 @@
 # Changelog
 
-## [2.0.2] - 2024-10-01
+## \[4.0.0\] - 2024-10-01
 
 ### Added
 
 - Add option `--dry-run`, add option --no-enforce-prefix
 - Add option `--github-org` to specify the Github Organization to be used
 - Remove option `--enfore-prefix`
+
+## [Unreleased]
+
+### Changed
+
+- Cleanup
 
 ## [2.0.1] - 2024-05-03
 

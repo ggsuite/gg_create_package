@@ -47,7 +47,7 @@ class CreatePackage extends Command<dynamic> {
   @override
   final name = 'cp';
 
-  /// The description shown when running `aud help createDartPackage`.
+  /// The help
   @override
   final description = 'Creates a new dart package.';
 

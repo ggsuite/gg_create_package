@@ -1,5 +1,5 @@
 name: gg_create_package
-description: The audanika developer command line
+description: A command line tool to create dart packages
 version: 1.0.3
 repository: https://github.com/ggsuite/gg_create_package.git
 
