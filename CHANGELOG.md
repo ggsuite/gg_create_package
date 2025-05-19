@@ -4,14 +4,9 @@
 
 ### Added
 
-- Add option --dry-run, add option --no-enforce-prefix
-
-### Changed
-
-- Make unit tests run under Windows
-### Removed
-
-- Remove options
+- Add option `--dry-run`, add option --no-enforce-prefix
+- Add option `--github-org` to specify the Github Organization to be used
+- Remove option `--enfore-prefix`
 
 ## [2.0.1] - 2024-05-03
 
