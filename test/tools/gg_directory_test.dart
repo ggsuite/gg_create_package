@@ -20,16 +20,14 @@ void main() {
     // #########################################################################
 
     group('should return the current project directory', () {
-      test(
-          'when the current working directory is the '
+      test('when the current working directory is the '
           'gg_create_package directory', () {
         // Expect the current working directory to end with
         // 'gg_create_package'
         expect(ggDirectory(), endsWith('gg_create_package'));
       });
 
-      test(
-          'when the current working directory is the parent dir of '
+      test('when the current working directory is the parent dir of '
           'gg_create_package', () {
         // Change the current working directory to the parent dir of
         // gg_create_package
@@ -38,8 +36,7 @@ void main() {
       });
     });
 
-    test(
-        'should throw when the current working dir '
+    test('should throw when the current working dir '
         'is not checkout dir or gg_create_package dir', () {
       // Change the current working dir to the grandparent dir of
       // gg_create_package

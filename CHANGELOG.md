@@ -10,6 +10,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Add .gitattributes
+
 ### Changed
 
 - Cleanup

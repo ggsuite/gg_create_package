@@ -11,17 +11,13 @@ import 'package:gg_create_package/src/commands/create_package.dart';
 import 'package:gg_log/gg_log.dart';
 
 // .............................................................................
-Future<void> run({
-  required List<String> args,
-  required GgLog ggLog,
-}) =>
-    GgCommandRunner(ggLog: ggLog, command: CreatePackage(ggLog: ggLog))
-        .run(args: args);
+Future<void> run({required List<String> args, required GgLog ggLog}) =>
+    GgCommandRunner(
+      ggLog: ggLog,
+      command: CreatePackage(ggLog: ggLog),
+    ).run(args: args);
 
 // .............................................................................
 Future<void> main(List<String> args) async {
-  await run(
-    args: args,
-    ggLog: print,
-  );
+  await run(args: args, ggLog: print);
 }

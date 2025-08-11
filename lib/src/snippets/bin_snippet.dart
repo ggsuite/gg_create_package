@@ -13,18 +13,16 @@
 import 'package:recase/recase.dart';
 
 /// The snippet for the bin/dart file
-String binSnippet({
-  required String packageName,
-  required String description,
-}) {
+String binSnippet({required String packageName, required String description}) {
   final packageNameSnakeCase = packageName.snakeCase;
   final packageNamePascalCase = packageName.pascalCase;
 
-  var descriptionMultiLine =
-      (description.split('.')..removeWhere((String e) => e.trim().isEmpty));
+  var descriptionMultiLine = (description.split('.')
+    ..removeWhere((String e) => e.trim().isEmpty));
 
-  description =
-      descriptionMultiLine.map((String e) => '\'${e.trim()}. \'').join('\n');
+  description = descriptionMultiLine
+      .map((String e) => '\'${e.trim()}. \'')
+      .join('\n');
 
   return '''
 import 'package:gg_args/gg_args.dart';

@@ -4,14 +4,14 @@ version: 4.0.1
 repository: https://github.com/ggsuite/gg_create_package.git
 
 environment:
-  sdk: ">=3.3.0<4.0.0"
+  sdk: ">=3.8.1<4.0.0"
 
 # Add regular dependencies here.
 dependencies:
   path: ^1.8.0
   args: ^2.4.2
   recase: ^4.1.0
-  dart_style: ^2.3.4
+  dart_style: ^3.1.2
   yaml_edit: ^2.1.1
   gg_args: ^2.0.2
   gg_log: ^1.0.0
@@ -20,7 +20,7 @@ dependencies:
 
 dev_dependencies:
   gg_capture_print: ^1.0.2
-  lints: ^3.0.0
+  lints: ^6.0.0
   test: ^1.24.0
 
 executables:

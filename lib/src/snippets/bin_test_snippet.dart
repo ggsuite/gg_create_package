@@ -13,10 +13,7 @@
 import 'package:recase/recase.dart';
 
 /// The snippet for the bin/dart file
-String binTestSnippet({
-  required String packageName,
-  bool isFlutter = false,
-}) {
+String binTestSnippet({required String packageName, bool isFlutter = false}) {
   final packageSnakeCase = packageName.snakeCase;
   final isFlutterPrefix = isFlutter ? 'flutter_' : '';
 
