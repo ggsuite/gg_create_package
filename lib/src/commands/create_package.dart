@@ -7,6 +7,7 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:dart_style/dart_style.dart';
 import 'package:gg_console_colors/gg_console_colors.dart';
 import 'package:gg_create_package/src/snippets/bin_test_snippet.dart';
 import 'package:gg_create_package/src/snippets/install_snippet.dart';
@@ -16,14 +17,13 @@ import 'package:gg_create_package/src/snippets/src_my_command_snippet.dart';
 import 'package:gg_create_package/src/snippets/src_snippet_with_command.dart';
 import 'package:gg_create_package/src/snippets/test_my_command_test_snippet.dart';
 import 'package:gg_create_package/src/snippets/test_snippet_with_command.dart';
-import 'package:gg_create_package/src/tools/gg_directory.dart';
 import 'package:gg_create_package/src/tools/checkout_directory.dart';
+import 'package:gg_create_package/src/tools/gg_directory.dart';
 import 'package:gg_create_package/src/tools/is_github_action.dart';
-import 'package:dart_style/dart_style.dart';
 import 'package:gg_log/gg_log.dart';
 import 'package:path/path.dart';
-import 'package:recase/recase.dart';
 import 'package:pubspec/pubspec.dart';
+import 'package:recase/recase.dart';
 
 import '../snippets/bin_snippet.dart';
 import '../snippets/example_snippet.dart';
@@ -47,14 +47,12 @@ class CreatePackage extends Command<dynamic> {
   @override
   final name = 'cp';
 
-  /// The description shown when running `aud help createDartPackage`.
+  /// The help
   @override
   final description = 'Creates a new dart package.';
 
   /// Constructor
-  CreatePackage({
-    required this.ggLog,
-  }) {
+  CreatePackage({required this.ggLog}) {
     // Add the output option
     argParser.addOption(
       'output',
@@ -87,6 +85,14 @@ class CreatePackage extends Command<dynamic> {
       negatable: true,
     );
 
+    // Add the githubOrg option
+    argParser.addOption(
+      'github-org',
+      abbr: 'g',
+      help: 'The GitHub organization to use.',
+      mandatory: true,
+    );
+
     // Add the push repo option
     argParser.addFlag(
       'prepare-github',
@@ -103,14 +109,6 @@ class CreatePackage extends Command<dynamic> {
       help: 'Force recreation. Existing package will be deleted.',
       negatable: true,
       defaultsTo: false,
-    );
-
-    // Force recreation
-    argParser.addFlag(
-      'enforce-prefix',
-      help: 'Enforces prefix aud or private and gg for open source projects.',
-      negatable: true,
-      defaultsTo: true,
     );
 
     // Add the cli option
@@ -162,17 +160,18 @@ class CreatePackage extends Command<dynamic> {
     final packageName = (argResults?['name'] as String).trim();
     final description = (argResults?['description'] as String).trim();
 
-    var homeDirectory = Platform.environment['HOME'] ??
+    var homeDirectory =
+        Platform.environment['HOME'] ??
         Platform.environment['USERPROFILE'] ?? // coverage:ignore-line
         ''; // coverage:ignore-line
     final isOpenSource = argResults?['open-source'] as bool;
     final pushToGitHub = argResults?['prepare-github'] as bool;
     final force = argResults?['force'] as bool;
-    final enforcePrefix = argResults?['enforce-prefix'] as bool;
     final createCli = argResults?['cli'] as bool;
     final createExample = argResults?['example'] as bool;
     final createFlutterPackage = argResults?['flutter'] as bool;
     final dryRun = argResults?['dry-run'] as bool;
+    final githubOrg = argResults?['github-org'] as String;
 
     final updatedOutputDir = outputDir.replaceAll('~', homeDirectory);
 
@@ -192,8 +191,8 @@ class CreatePackage extends Command<dynamic> {
       createCli: createCli,
       createExample: createExample,
       createFlutterPackage: createFlutterPackage,
-      enforcePrefix: enforcePrefix,
       dryRun: dryRun,
+      githubOrg: githubOrg,
     ).run();
   }
 
@@ -210,14 +209,14 @@ class _CreateDartPackage {
     required this.description,
     required this.ggLog,
     required this.isOpenSource,
-    required this.enforcePrefix,
     required this.prepareGitHub,
     required this.force,
     required this.createCli,
     required this.createExample,
     required this.createFlutterPackage,
     required this.dryRun,
-  });
+    required this.githubOrg,
+  }) : githubRepo = 'https://github.com/$githubOrg';
 
   final String outputDir;
   final String packageDir;
@@ -225,15 +224,17 @@ class _CreateDartPackage {
   final String description;
   final GgLog ggLog;
   final bool isOpenSource;
-  final bool enforcePrefix;
   final bool prepareGitHub;
   final bool force;
   final bool createCli;
   final bool createExample;
   final bool createFlutterPackage;
   final bool dryRun;
-  static const gitHubRepo = 'https://github.com/inlavigo';
-  final formatter = DartFormatter();
+  final String githubOrg;
+  final String githubRepo;
+  final formatter = DartFormatter(
+    languageVersion: DartFormatter.latestLanguageVersion,
+  );
 
   // ...........................................................................
   Future<void> run() async {
@@ -241,7 +242,6 @@ class _CreateDartPackage {
 
     await _deleteExistingPackage();
     _checkDirectories();
-    _checkPackageName();
     _checkDescription();
     await _checkGithubOrigin();
     await _createPackage();
@@ -335,23 +335,6 @@ class _CreateDartPackage {
   }
 
   // ...........................................................................
-  /// Validates the package name and its prefix
-  void _checkPackageName() {
-    if (!enforcePrefix) {
-      return;
-    }
-
-    ggLog('Check package names...');
-    if (isOpenSource && !packageName.startsWith('gg_')) {
-      throw Exception('Open source packages should start with "gg_"');
-    }
-
-    if (!isOpenSource && !packageName.startsWith('aud_')) {
-      throw Exception('Non open source packages should start with "aud_"');
-    }
-  }
-
-  // ...........................................................................
   /// Validates that the description is long enough
   void _checkDescription() {
     ggLog('Check description ...');
@@ -369,19 +352,19 @@ class _CreateDartPackage {
 
     ggLog('Check GitHub origin...');
 
-    final repo = 'git@github.com:inlavigo/$packageName.git';
+    final repo = 'git@github.com:$githubOrg/$packageName.git';
 
-    final result = await Process.run(
-      'git',
-      ['ls-remote', repo, 'origin'],
-      workingDirectory: outputDir,
-    );
+    final result = await Process.run('git', [
+      'ls-remote',
+      repo,
+      'origin',
+    ], workingDirectory: outputDir);
 
     // coverage:ignore-start
     if (result.exitCode == 128) {
       throw Exception(
         'The github repository "$repo" does not exist. '
-        'Please visit "https://github.com/inlavigo" and create the repository.',
+        'Please visit "https://github.com/$githubOrg" and create the repository.',
       );
     } else if (result.exitCode != 0) {
       throw Exception(
@@ -402,18 +385,14 @@ class _CreateDartPackage {
     }
 
     // Create the dart package
-    final result = await Process.run(
-      'dart',
-      [
-        'create',
-        '-t',
-        'package',
-        packageName,
-        '--no-pub',
-        force ? '--force' : '',
-      ],
-      workingDirectory: outputDir,
-    );
+    final result = await Process.run('dart', [
+      'create',
+      '-t',
+      'package',
+      packageName,
+      '--no-pub',
+      force ? '--force' : '',
+    ], workingDirectory: outputDir);
 
     // Log result
     // coverage:ignore-start
@@ -452,9 +431,9 @@ class _CreateDartPackage {
     final content = Directory(source).listSync(recursive: true);
     for (final entity in content) {
       if (entity is Directory) {
-        Directory(join(target, basename(entity.path))).createSync(
-          recursive: true,
-        );
+        Directory(
+          join(target, basename(entity.path)),
+        ).createSync(recursive: true);
       } else if (entity is File) {
         final relativePath = relative(entity.path, from: source);
         final targetPath = join(target, relativePath);
@@ -576,10 +555,7 @@ class _CreateDartPackage {
       return;
     }
     // coverage:ignore-start
-    final result = Process.runSync(
-      'chmod',
-      ['+x', filePath],
-    );
+    final result = Process.runSync('chmod', ['+x', filePath]);
 
     if (result.exitCode != 0) {
       throw Exception('Error while running "chmod +x $filePath"');
@@ -598,17 +574,15 @@ class _CreateDartPackage {
 
     final publishTo = isOpenSource ? '' : '\npublish_to: none';
 
-    _replaceInFile(
-      pubspecFile,
-      {
-        r'sdk:.*': 'sdk: "${CreatePackage.dartSdkConstraint}"',
-        r'^#\srepository:.*':
-            'repository: $gitHubRepo/$packageName.git' '$publishTo',
-        r'^description:.*': 'description: $description',
-        r'^# Add regular dependencies here.\n': '',
-        r'  # path:': '  path:',
-      },
-    );
+    _replaceInFile(pubspecFile, {
+      r'sdk:.*': 'sdk: "${CreatePackage.dartSdkConstraint}"',
+      r'^#\srepository:.*':
+          'repository: $githubRepo/$packageName.git'
+          '$publishTo',
+      r'^description:.*': 'description: $description',
+      r'^# Add regular dependencies here.\n': '',
+      r'  # path:': '  path:',
+    });
 
     if (createCli) {
       _appendInFile(pubspecFile, '\nexecutables:\n $packageName:');
@@ -651,8 +625,12 @@ class _CreateDartPackage {
     final launchJsonTestDirectory = join(packageDir, 'test', 'vscode');
     Directory(launchJsonTestDirectory).createSync(recursive: true);
 
-    final launchJsonTestFile =
-        join(packageDir, 'test', 'vscode', 'launch_json_test.dart');
+    final launchJsonTestFile = join(
+      packageDir,
+      'test',
+      'vscode',
+      'launch_json_test.dart',
+    );
     final snippet = launchJsonTestSnippet(
       packageName: packageName,
       isFlutter: createFlutterPackage,
@@ -681,18 +659,21 @@ class _CreateDartPackage {
   /// Creates the main implementation file in lib/src
   void _prepareMainSrcFile() {
     ggLog('Prepare src ...');
-    if (dryRun) {
-      return;
-    }
-    final implementationFile =
-        join(packageDir, 'lib', 'src', '$packageName.dart');
+    if (dryRun) return;
+    final implementationFile = join(
+      packageDir,
+      'lib',
+      'src',
+      '$packageName.dart',
+    );
     final implementationSnippet =
         (createCli ? srcSnippetWithCommand : srcSnippetWithoutCommand).call(
-      packageName: packageName,
-    );
+          packageName: packageName,
+        );
 
-    final content =
-        formatter.format('$fileHeaderSnippet\n\n$implementationSnippet\n');
+    final content = formatter.format(
+      '$fileHeaderSnippet\n\n$implementationSnippet\n',
+    );
     File(implementationFile).writeAsStringSync(content);
   }
 
@@ -709,8 +690,9 @@ class _CreateDartPackage {
 
     final implementationFile = join(commandDir, 'my_command.dart');
     final implementationSnippet = srcCommandsMyCommandSnippet;
-    final content =
-        formatter.format('$fileHeaderSnippet\n\n$implementationSnippet\n');
+    final content = formatter.format(
+      '$fileHeaderSnippet\n\n$implementationSnippet\n',
+    );
     File(implementationFile).writeAsStringSync(content);
   }
 
@@ -730,7 +712,9 @@ class _CreateDartPackage {
     );
 
     binFileContent =
-        '$makeExecutableSnippet$fileHeaderSnippet\n\n$binFileContent\n';
+        '$makeExecutableSnippet'
+        '$fileHeaderSnippet\n\n'
+        '$binFileContent\n';
     binFileContent = formatter.format(binFileContent);
 
     File(binFile).writeAsStringSync(binFileContent);
@@ -752,7 +736,9 @@ class _CreateDartPackage {
       isFlutter: createFlutterPackage,
     );
 
-    fileContent = '$fileHeaderSnippet\n\n$fileContent\n';
+    fileContent =
+        '$fileHeaderSnippet\n\n'
+        '$fileContent\n';
     fileContent = formatter.format(fileContent);
 
     File(binTestFile).writeAsStringSync(fileContent);
@@ -770,12 +756,13 @@ class _CreateDartPackage {
     final testFile = join(testFolder, '${packageName}_test.dart');
     final testFileContent =
         (createCli ? testSnippetWithCommand : testSnippetWithoutCommand).call(
-      packageName: packageName,
-      isFlutter: createFlutterPackage,
-    );
+          packageName: packageName,
+          isFlutter: createFlutterPackage,
+        );
 
-    final content =
-        formatter.format('$fileHeaderSnippet\n\n$testFileContent\n');
+    final content = formatter.format(
+      '$fileHeaderSnippet\n\n$testFileContent\n',
+    );
     File(testFile).writeAsStringSync(content);
   }
 
@@ -793,8 +780,9 @@ class _CreateDartPackage {
       packageName: packageName,
       isFlutter: createFlutterPackage,
     );
-    final content =
-        formatter.format('$fileHeaderSnippet\n\n$testFileContent\n');
+    final content = formatter.format(
+      '$fileHeaderSnippet\n\n$testFileContent\n',
+    );
     File(testFile).writeAsStringSync(content);
   }
 
@@ -807,11 +795,14 @@ class _CreateDartPackage {
     }
     final exampleFolder = join(packageDir, 'example');
     Directory(exampleFolder).createSync();
-    final exampleFile =
-        join(exampleFolder, '${packageName.snakeCase}_example.dart');
+    final exampleFile = join(
+      exampleFolder,
+      '${packageName.snakeCase}_example.dart',
+    );
 
     final exampleFileContent = exampleSnippet(packageName: packageName);
-    final content = '$makeExecutableSnippet'
+    final content =
+        '$makeExecutableSnippet'
         '$fileHeaderSnippet\n\n'
         '$exampleFileContent\n';
 
@@ -892,23 +883,20 @@ class _CreateDartPackage {
     final myDirectory = Directory(packageDir);
 
     // Add flutter SDK
-    final pubSpec = (await PubSpec.load(myDirectory)).copy(
-      dependencies: {
-        'flutter': const SdkReference('flutter'),
-      },
-    ).copy(
-      devDependencies: {
-        'flutter_lints': DependencyReference.fromJson('^3.0.0'),
-        'flutter_test': const SdkReference('flutter'),
-      },
-    ).copy(
-      environment: Environment.fromJson(
-        {
-          'flutter': CreatePackage.flutterSdkConstraint,
-          'sdk': CreatePackage.dartSdkConstraint,
-        },
-      ),
-    );
+    var pubSpec = (await PubSpec.load(myDirectory))
+        .copy(dependencies: {'flutter': const SdkReference('flutter')})
+        .copy(
+          devDependencies: {
+            'flutter_lints': DependencyReference.fromJson('^3.0.0'),
+            'flutter_test': const SdkReference('flutter'),
+          },
+        )
+        .copy(
+          environment: Environment.fromJson({
+            'flutter': CreatePackage.flutterSdkConstraint,
+            'sdk': CreatePackage.dartSdkConstraint,
+          }),
+        );
 
     // Save it
     await pubSpec.save(myDirectory);
@@ -946,9 +934,7 @@ class _CreateDartPackage {
 
     if (result.exitCode != 0) {
       // coverage:ignore-start
-      throw Exception(
-        'Error while running "dart ${options.join(' ')}"',
-      );
+      throw Exception('Error while running "dart ${options.join(' ')}"');
       // coverage:ignore-end
     }
   }
@@ -957,12 +943,8 @@ class _CreateDartPackage {
   /// Installs dev dependencies using `dart pub add --dev`
   void _installDevDependencies() {
     ggLog('Install dev dependencies...');
-    if (dryRun) {
-      return;
-    }
-    final packages = [
-      if (createCli) 'gg_capture_print',
-    ];
+    if (dryRun) return;
+    final packages = [if (createCli) 'gg_capture_print'];
 
     if (packages.isEmpty) {
       return;
@@ -978,9 +960,7 @@ class _CreateDartPackage {
 
     if (result.exitCode != 0) {
       // coverage:ignore-start
-      throw Exception(
-        'Error while running "dart ${options.join(' ')}"',
-      );
+      throw Exception('Error while running "dart ${options.join(' ')}"');
       // coverage:ignore-end
     }
   }
@@ -993,17 +973,14 @@ class _CreateDartPackage {
       return;
     }
 
-    final result = Process.runSync(
-      'dart',
-      ['pub', 'get'],
-      workingDirectory: packageDir,
-    );
+    final result = Process.runSync('dart', [
+      'pub',
+      'get',
+    ], workingDirectory: packageDir);
 
     if (result.exitCode != 0) {
       // coverage:ignore-start
-      throw Exception(
-        'Error while running "dart pub get"',
-      );
+      throw Exception('Error while running "dart pub get"');
       // coverage:ignore-end
     }
   }
@@ -1027,10 +1004,7 @@ class _CreateDartPackage {
       return;
     }
     // Execute dart fix
-    final result = Process.runSync(
-      'dart',
-      ['fix', '--apply', packageDir],
-    );
+    final result = Process.runSync('dart', ['fix', '--apply', packageDir]);
 
     if (result.exitCode != 0) {
       // coverage:ignore-start
@@ -1039,10 +1013,7 @@ class _CreateDartPackage {
     }
 
     // Execute dart analyze
-    final result2 = Process.runSync(
-      'dart',
-      ['analyze', packageDir],
-    );
+    final result2 = Process.runSync('dart', ['analyze', packageDir]);
     if (result2.exitCode != 0) {
       // coverage:ignore-start
       throw Exception(
@@ -1054,10 +1025,7 @@ class _CreateDartPackage {
       // coverage:ignore-end
     }
     // Format code
-    final result3 = Process.runSync('dart', [
-      'format',
-      packageDir,
-    ]);
+    final result3 = Process.runSync('dart', ['format', packageDir]);
 
     if (result3.exitCode != 0) {
       // coverage:ignore-start
@@ -1066,10 +1034,11 @@ class _CreateDartPackage {
     }
 
     // Check that no formatting is left
-    final result4 = Process.runSync(
-      'dart',
-      ['format', packageDir, '--set-exit-if-changed'],
-    );
+    final result4 = Process.runSync('dart', [
+      'format',
+      packageDir,
+      '--set-exit-if-changed',
+    ]);
 
     if (result4.exitCode != 0) {
       // coverage:ignore-start
@@ -1096,31 +1065,29 @@ class _CreateDartPackage {
 
     ggLog('Init git...');
     // Execute git init
-    final result = Process.runSync(
-      'git',
-      ['init'],
-      workingDirectory: packageDir,
-    );
+    final result = Process.runSync('git', [
+      'init',
+    ], workingDirectory: packageDir);
 
     if (result.exitCode != 0) {}
 
     // Execute git branch -M main
-    final result2 = Process.runSync(
-      'git',
-      ['branch', '-M', 'main'],
-      workingDirectory: packageDir,
-    );
+    final result2 = Process.runSync('git', [
+      'branch',
+      '-M',
+      'main',
+    ], workingDirectory: packageDir);
 
     if (result2.exitCode != 0) {
       throw Exception('Error while running git branch -M main');
     }
 
     // Execute git config advice.addIgnoredFile false
-    final result3 = Process.runSync(
-      'git',
-      ['config', 'advice.addIgnoredFile', 'false'],
-      workingDirectory: packageDir,
-    );
+    final result3 = Process.runSync('git', [
+      'config',
+      'advice.addIgnoredFile',
+      'false',
+    ], workingDirectory: packageDir);
 
     if (result3.exitCode != 0) {
       throw Exception(
@@ -1129,20 +1096,18 @@ class _CreateDartPackage {
     }
 
     // Execute git add *
-    final result4 = Process.runSync(
-      'git',
-      ['add', '*'],
-      workingDirectory: packageDir,
-    );
+    final result4 = Process.runSync('git', [
+      'add',
+      '*',
+    ], workingDirectory: packageDir);
 
     if (result4.exitCode != 0) {}
 
     // Execute git commit -m"Initial boylerplate"
-    final result5 = Process.runSync(
-      'git',
-      ['commit', '-m"Initial boylerplate"'],
-      workingDirectory: packageDir,
-    );
+    final result5 = Process.runSync('git', [
+      'commit',
+      '-m"Initial boylerplate"',
+    ], workingDirectory: packageDir);
 
     if (result5.exitCode != 0) {
       throw Exception('Error while running git commit -m"Initial boylerplate"');
@@ -1150,27 +1115,28 @@ class _CreateDartPackage {
 
     // Push repo to GitHub
     if (prepareGitHub) {
-      final gitHubOrigin = 'git@github.com:inlavigo/$packageName.git';
+      final gitHubOrigin = 'git@github.com:$githubOrg/$packageName.git';
 
-      final result6 = Process.runSync(
-        'git',
-        ['remote', 'add', 'origin', gitHubOrigin],
-        workingDirectory: packageDir,
-      );
+      final result6 = Process.runSync('git', [
+        'remote',
+        'add',
+        'origin',
+        gitHubOrigin,
+      ], workingDirectory: packageDir);
 
       if (result6.exitCode != 0) {
-        throw Exception(
-          'Error add GitHub origin "$gitHubOrigin" ',
-        );
+        throw Exception('Error add GitHub origin "$gitHubOrigin" ');
       }
 
       // Execute git push -u origin main --dry-run
 
-      final result7 = Process.runSync(
-        'git',
-        ['push', '-u', 'origin', 'main', '--dry-run'],
-        workingDirectory: packageDir,
-      );
+      final result7 = Process.runSync('git', [
+        'push',
+        '-u',
+        'origin',
+        'main',
+        '--dry-run',
+      ], workingDirectory: packageDir);
 
       if (result7.exitCode != 0) {
         throw Exception(

@@ -1,3 +1,3 @@
-# Aud
+# GgCreatePackage
 
-The audanika developer command line
+A command line tool to create dart packages
