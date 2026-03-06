@@ -1,5 +1,5 @@
 // @license
-// Copyright (c) 2019 - 2024 Dr. Gabriel Gatzsche. All Rights Reserved.
+// Copyright (c) 2025 Göran Hegenberg. All Rights Reserved.
 //
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
@@ -149,6 +149,13 @@ void main() {
           // The package should contain a .vscode/extensions.json file
           expect(
             File(join(tempPackageDir.path, '.vscode', 'extensions.json'))
+                .existsSync(),
+            true,
+          );
+
+          // The package should contain a contributors-readme.md file
+          expect(
+            File(join(tempPackageDir.path, 'contributors-readme.md'))
                 .existsSync(),
             true,
           );
@@ -359,6 +366,13 @@ void main() {
           expect(
             File(join(tempPackageDir.path, 'LICENSE')).readAsStringSync(),
             openSourceLicenseSnippet,
+          );
+
+          // The package should contain a contributors-readme.md file
+          expect(
+            File(join(tempPackageDir.path, 'contributors-readme.md'))
+                .existsSync(),
+            true,
           );
 
           // Do not add »publish_to: none« to pubspec.yaml
