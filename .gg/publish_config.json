@@ -1,0 +1,6 @@
+{
+  "publishConfig": {
+    "mergeMessage": "Use ggwsm in pipelines",
+    "versionIncrement": "patch"
+  }
+}
