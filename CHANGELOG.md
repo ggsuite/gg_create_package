@@ -5,6 +5,7 @@
 ### Added
 
 - Add .gitattributes
+- Add the current ggsuite DNA
 
 ### Changed
 
