@@ -1,10 +1,11 @@
 # Changelog
 
-## Unreleased
+## 4.1.0 - 2026-09-03
 
 ### Added
 
 - Add .gitattributes
+- Add the current ggsuite DNA
 
 ### Changed
 
